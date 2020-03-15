@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://source/grog/room_display.gd" type="Script" id=2]
+
+[node name="display" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+room_place_path = NodePath("Control/room_anchor/room_place")
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+margin_bottom = 800.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="room_anchor" type="Control" parent="Control"]
+anchor_left = 0.5
+anchor_right = 0.5
+
+[node name="room_place" type="Position2D" parent="Control/room_anchor"]
+position = Vector2( -640, 0 )

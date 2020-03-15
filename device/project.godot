@@ -8,16 +8,32 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Resource",
+"class": "GameResource",
+"language": "GDScript",
+"path": "res://source/grog/core/game_resource.gd"
+}, {
+"base": "Resource",
+"class": "RoomResource",
+"language": "GDScript",
+"path": "res://source/grog/core/room_resource.gd"
+} ]
 _global_script_class_icons={
-
+"GameResource": "",
+"RoomResource": ""
 }
 
 [application]
 
 config/name="Grog"
-run/main_scene="res://main_scene.tscn"
+run/main_scene="res://apps/scene_tester/scene_tester.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/size/width=1366
+window/size/height=768
 
 [rendering]
 
