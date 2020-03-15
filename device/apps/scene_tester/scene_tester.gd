@@ -7,7 +7,6 @@ onready var _ui = $ui
 onready var _display = $display
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	if not game_to_load:
 		push_error("No game_to_load")
@@ -19,12 +18,14 @@ func list_rooms():
 	if not _room_list:
 		push_error("No _room_list")
 		return
-		
-	for room in game_to_load.get_all_rooms():
+	
+	var all_rooms = game_to_load.get_all_rooms()
+	
+	for room in all_rooms:
 		_room_list.room_added(room)
-
-
-
+	
+	_room_list.select_anyone()
+	
 func _on_test_room_button_pressed():
 	if not _room_list:
 		push_error("No _room_list")
@@ -37,10 +38,13 @@ func _on_test_room_button_pressed():
 	
 	load_room(current_room)
 	
-func load_room(_room):
+func load_room(_room_resource):
 	
 	
-	_display.load_room(_room)
+	var room = _display.load_room(_room_resource)
 	
 	_ui.hide()
 	_display.show()
+	
+	room.start_room()
+	

@@ -4,7 +4,8 @@ export (Resource) var room_item_model
 
 export (NodePath) var room_list_path
 
-var _room_list
+var _rooms = []
+onready var _room_list = get_node(room_list_path)
 
 var _current_selected = null
 
@@ -30,7 +31,14 @@ func room_added(room: Resource) -> void:
 	room_item.connect("room_item_toggled", self, "on_room_toggled")
 	
 	_room_list.add_child(room_item)
+	_rooms.append(room_item)
 
+func select_anyone():
+	if _rooms.size() == 0:
+		return
+	
+	var some_item = _rooms[0]
+	some_item.check()
 
 #	@PRIVATE
 
@@ -39,13 +47,10 @@ func on_room_toggled(room_view, value):
 		push_error("No room_view")
 		return
 	
-	#var room = room_view.target
-	#print("Room %s (%s) was toggled to %s" % [room, room.room_name, value])
-	
 	if value:
 		if _current_selected:
 			if room_view == _current_selected:
-				push_warning("Room '%s' already selected" % room_view.room_name)
+				push_warning("Room '%s' already selected" % room_view.target.room_name)
 				return
 			
 			_current_selected.uncheck()
@@ -63,10 +68,5 @@ func on_room_toggled(room_view, value):
 		
 		_current_selected = null
 
-
-#	@GODOT
-
-func _ready():
-	_room_list = get_node(room_list_path)
 	
 

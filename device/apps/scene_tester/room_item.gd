@@ -18,6 +18,7 @@ func target_changing(_old_target, _new_target):
 
 func check():
 	$check.pressed = true
+	
 
 func uncheck():
 	$check.pressed = false
