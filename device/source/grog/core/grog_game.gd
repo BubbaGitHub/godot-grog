@@ -64,6 +64,8 @@ func run_instruction(inst: Dictionary):
 				return
 		"show_controls":
 			display.show_controls()
+		"hide_controls":
+			display.hide_controls()
 		"wait":
 			if inst.params.size() < 1:
 				print("One parameter needed for wait")

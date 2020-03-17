@@ -6,11 +6,14 @@ export (NodePath) var controls_place_path
 export (bool) var update_layout = false
 
 var _room_place: Control
+var _controls_place: Control
 var _current_room: Node2D
 var _current_player: Node2D
 
 func _ready():
 	_room_place = get_node(room_place_path)
+	_controls_place = get_node(controls_place_path)
+	
 	#ignore-warning:return_value_discarded
 	var _ret = get_tree().get_root().connect("size_changed", self, "on_viewport_resized")
 	
@@ -46,10 +49,12 @@ func load_room(room_to_load : Resource) -> Node:
 	return room
 
 func show_controls():
-	
-	var controls = get_node(controls_place_path)
-	if controls:
-		controls.show()
+	if _controls_place:
+		_controls_place.show()
+
+func hide_controls():
+	if _controls_place:
+		_controls_place.hide()
 
 func update_room_layout():
 	var scale = _room_place.rect_size.y / _current_room.height
@@ -62,7 +67,6 @@ func update_room_layout():
 func on_viewport_resized():
 	if not update_layout:
 		return
-	var new_size = get_tree().get_root().size
 	
 	update_room_layout()
 
