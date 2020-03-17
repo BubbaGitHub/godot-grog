@@ -1,28 +1,17 @@
 extends Node2D
 
+# TODO extract this from scene?
+# TODO make room Control instead of Node2D?
 export (int) var width = 1366
 export (int) var height = 768
 
+export (NodePath) var player_place_path
+
 func start_room():
-	var player = $player_position/player
-	
-	if not player:
-		return
-	
-	var player_anim : AnimationPlayer = player.get_node("animation")
-	
-	if not player_anim:
-		return
-	
-	var anim_name = "walk_front"
-	
-	if not player_anim.has_animation(anim_name):
-		return
-	
-	player_anim.play(anim_name)
+	pass
 	
 func get_player_place():
-	return $player_position
+	return get_node(player_place_path)
 
 func _ready():
 	pass
