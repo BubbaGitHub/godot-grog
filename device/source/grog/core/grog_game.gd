@@ -47,7 +47,13 @@ func run_instruction(inst: Dictionary):
 				return
 			
 			var room_name = inst.params[0]
-			var room = load_room(room_name)
+			var actor_name = null
+			if inst.params.size() >= 2:
+				var actor_param = inst.params[1]
+				if actor_param.begins_with("player="):
+					actor_name = actor_param.substr(len("player="))
+
+			var room = load_room(room_name, actor_name)
 			
 			if not room:
 				print("Couldn't load room '%s'" % room_name)
@@ -71,13 +77,24 @@ func push_actions(action_list):
 	for a in action_list:
 		pending_actions.push_back(a)
 
-func load_room(room_name: String):
+func load_room(room_name: String, actor_name):
 	var room_resource = get_room(room_name)
 	if not room_resource:
 		print("No room '%s'" % room_name)
 		return null
 	
+	var actor_resource = null
+	
+	if actor_name:
+		actor_resource = get_actor(actor_name)
+		if not actor_resource:
+			print("No actor '%s'" % actor_name)
+			#return null
+			
 	var room = display.load_room(room_resource)
+	
+	if actor_resource:
+		display.load_player(actor_resource)
 	
 	# room is ready here
 	# TODO schedule it...
@@ -87,9 +104,15 @@ func load_room(room_name: String):
 
 
 func get_room(room_name):
-	var all_rooms = data.get_all_rooms()
-	for i in range(all_rooms.size()):
-		var room = all_rooms[i]
-		if room.get_name() == room_name:
-			return room
+	return get_resource_in(data.get_all_rooms(), room_name)
+
+func get_actor(actor_name):
+	return get_resource_in(data.get_all_actors(), actor_name)
+
+func get_resource_in(list, elem_name):
+	for i in range(list.size()):
+		var elem = list[i]
+		
+		if elem.get_name() == elem_name:
+			return elem
 	return null

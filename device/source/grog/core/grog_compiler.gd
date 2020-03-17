@@ -183,7 +183,7 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 					return []
 					
 			TokenizerState.ReadingToken:
-				if c == " " or c == "=":
+				if c == " ":
 					tokens.append(current_token)
 					current_token = ""
 					state = TokenizerState.WaitingNextToken
@@ -193,7 +193,7 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 				elif c == "#":
 					compiled_script.add_error("Unexpected '#' inside token")
 					return []
-				elif contains_pattern(c, token_char_regex()):
+				elif c == "=" or contains_pattern(c, token_char_regex()):
 					# TODO build string efficiently
 					current_token = current_token + c
 				else:

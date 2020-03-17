@@ -21,5 +21,8 @@ func start_room():
 	
 	player_anim.play(anim_name)
 	
+func get_player_place():
+	return $player_position
+
 func _ready():
 	pass

@@ -6,6 +6,7 @@ export (bool) var update_layout = false
 
 var _room_place: Control
 var _current_room: Node2D
+var _current_player: Node2D
 
 func _ready():
 	_room_place = get_node(room_place_path)
@@ -14,16 +15,26 @@ func _ready():
 	
 	# TODO _ret
 
+func load_player(actor_resource):
+	
+	var player_place = _current_room.get_player_place()
+	var actor_scene = actor_resource.actor_scene
+	var player : Node2D = actor_scene.instance()
+	
+	make_empty(player_place)
+	
+	_current_player = player
+	
+	player_place.add_child(player)
+	
+	
 func load_room(room_to_load : Resource) -> Node:
 	var room_scene = room_to_load.room_scene
 	
 	var room : Node2D = room_scene.instance()
 	
 	# makes _room_place empty
-	while _room_place.get_child_count():
-		var first_child = _room_place.get_child(0)
-		_room_place.remove_child(first_child)
-		first_child.queue_free()
+	make_empty(_room_place)
 	
 	_current_room = room
 	
@@ -47,4 +58,11 @@ func on_viewport_resized():
 	var new_size = get_tree().get_root().size
 	
 	update_room_layout()
-	
+
+#####
+
+func make_empty(node):
+	while node.get_child_count():
+		var first_child = node.get_child(0)
+		node.remove_child(first_child)
+		first_child.queue_free()

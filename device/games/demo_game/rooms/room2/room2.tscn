@@ -1,10 +1,9 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://games/demo_game/rooms/room1/images/bg.jpg" type="Texture" id=1]
 [ext_resource path="res://games/demo_game/rooms/room1/images/desk.png" type="Texture" id=2]
 [ext_resource path="res://games/demo_game/rooms/room1/images/table.png" type="Texture" id=3]
 [ext_resource path="res://source/grog/room.gd" type="Script" id=4]
-[ext_resource path="res://games/demo_game/actors/guybrush/guybrush.tscn" type="PackedScene" id=5]
 
 [sub_resource type="NavigationPolygon" id=1]
 vertices = PoolVector2Array( 436.868, 546.816, 495.184, 579.457, 391.092, 579.324, 221.168, 567.81, 475.346, 666.896, 251.455, 617.09, 617.982, 667.559, 704, 768, -541.651, 767.385, -134.578, 617.09, -276.7, 547.05, -116.127, 567.29 )
@@ -42,5 +41,3 @@ navpoly = SubResource( 1 )
 
 [node name="player_position" type="Position2D" parent="."]
 position = Vector2( 402.149, 708.587 )
-
-[node name="player" parent="player_position" instance=ExtResource( 5 )]
