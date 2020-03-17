@@ -40,6 +40,10 @@ func process(delta):
 		
 		
 func run_instruction(inst: Dictionary):
+	if inst.subject:
+		print("Unknown subject '%s'" % inst.subject)
+		return
+	
 	match inst.command:
 		"load_room":
 			if inst.params.size() < 1:
@@ -58,7 +62,8 @@ func run_instruction(inst: Dictionary):
 			if not room:
 				print("Couldn't load room '%s'" % room_name)
 				return
-			
+		"show_controls":
+			display.show_controls()
 		"wait":
 			if inst.params.size() < 1:
 				print("One parameter needed for wait")

@@ -11,6 +11,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 room_place_path = NodePath("room_area/room_container/room_anchor")
+controls_place_path = NodePath("command_area/Control")
 update_layout = true
 
 [node name="ColorRect" type="ColorRect" parent="."]
@@ -49,6 +50,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Control" type="Control" parent="command_area"]
+visible = false
 anchor_right = 0.5
 anchor_bottom = 1.0
 margin_left = 20.0

@@ -1,6 +1,7 @@
 extends Node
 
 export (NodePath) var room_place_path
+export (NodePath) var controls_place_path
 
 export (bool) var update_layout = false
 
@@ -43,6 +44,12 @@ func load_room(room_to_load : Resource) -> Node:
 	update_room_layout()
 	
 	return room
+
+func show_controls():
+	
+	var controls = get_node(controls_place_path)
+	if controls:
+		controls.show()
 
 func update_room_layout():
 	var scale = _room_place.rect_size.y / _current_room.height
