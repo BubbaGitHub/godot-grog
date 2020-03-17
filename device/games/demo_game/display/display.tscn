@@ -11,6 +11,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 room_place_path = NodePath("room_area/room_container/room_anchor")
+update_layout = true
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchor_right = 1.0
@@ -22,7 +23,7 @@ __meta__ = {
 
 [node name="room_area" type="Control" parent="."]
 anchor_right = 1.0
-anchor_bottom = 0.7
+anchor_bottom = 0.75
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -43,7 +44,7 @@ __meta__ = {
 }
 
 [node name="command_area" type="Control" parent="."]
-anchor_top = 0.7
+anchor_top = 0.75
 anchor_right = 1.0
 anchor_bottom = 1.0
 
@@ -70,48 +71,48 @@ __meta__ = {
 
 [node name="Control" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_right = 211.0
-margin_bottom = 60.0
+margin_bottom = 48.0
 
 [node name="Control2" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_left = 215.0
 margin_right = 426.0
-margin_bottom = 60.0
+margin_bottom = 48.0
 
 [node name="Control3" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_left = 430.0
 margin_right = 641.0
-margin_bottom = 60.0
+margin_bottom = 48.0
 
 [node name="Control4" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
-margin_top = 64.0
+margin_top = 52.0
 margin_right = 211.0
-margin_bottom = 124.0
+margin_bottom = 100.0
 
 [node name="Control5" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_left = 215.0
-margin_top = 64.0
+margin_top = 52.0
 margin_right = 426.0
-margin_bottom = 124.0
+margin_bottom = 100.0
 
 [node name="Control6" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_left = 430.0
-margin_top = 64.0
+margin_top = 52.0
 margin_right = 641.0
-margin_bottom = 124.0
+margin_bottom = 100.0
 
 [node name="Control7" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
-margin_top = 128.0
+margin_top = 104.0
 margin_right = 211.0
-margin_bottom = 188.0
+margin_bottom = 152.0
 
 [node name="Control8" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_left = 215.0
-margin_top = 128.0
+margin_top = 104.0
 margin_right = 426.0
-margin_bottom = 188.0
+margin_bottom = 152.0
 
 [node name="Control9" parent="command_area/Control/GridContainer" instance=ExtResource( 3 )]
 margin_left = 430.0
-margin_top = 128.0
+margin_top = 104.0
 margin_right = 641.0
-margin_bottom = 188.0
+margin_bottom = 152.0

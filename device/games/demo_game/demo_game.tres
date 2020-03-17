@@ -1,9 +1,13 @@
-[gd_resource type="Resource" load_steps=4 format=2]
+[gd_resource type="Resource" load_steps=6 format=2]
 
 [ext_resource path="res://source/grog/core/game_resource.gd" type="Script" id=1]
 [ext_resource path="res://games/demo_game/rooms/room1/demo_room.tres" type="Resource" id=2]
 [ext_resource path="res://games/demo_game/rooms/room2/demo_room2.tres" type="Resource" id=3]
+[ext_resource path="res://games/demo_game/demo_game.gd" type="Script" id=4]
+[ext_resource path="res://games/demo_game/demo_game_main_script.tres" type="Resource" id=5]
 
 [resource]
 script = ExtResource( 1 )
+scripts = [ ExtResource( 5 ) ]
 rooms = [ ExtResource( 2 ), ExtResource( 3 ) ]
+game_model = ExtResource( 4 )

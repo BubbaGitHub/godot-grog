@@ -1,0 +1,20 @@
+
+
+# example grog file
+
+
+:start
+
+.load_room "room1" # loads the room 'room1' with no player
+.wait 0.5 seconds
+
+.say "A long long time ago..."
+
+bust.say "What happened?"
+
+.wait 0.5 seconds
+
+.load_room "room2" player=mark
+
+mark.say "This place reminds me of something"
+

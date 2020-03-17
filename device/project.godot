@@ -9,10 +9,25 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Reference",
+"class": "CompiledGrogScript",
+"language": "GDScript",
+"path": "res://source/grog/core/compiled_grog_script.gd"
+}, {
 "base": "Resource",
 "class": "GameResource",
 "language": "GDScript",
 "path": "res://source/grog/core/game_resource.gd"
+}, {
+"base": "Reference",
+"class": "GrogCompiler",
+"language": "GDScript",
+"path": "res://source/grog/core/grog_compiler.gd"
+}, {
+"base": "Resource",
+"class": "GrogScript",
+"language": "GDScript",
+"path": "res://source/grog/core/grog_script.gd"
 }, {
 "base": "Resource",
 "class": "RoomResource",
@@ -20,20 +35,31 @@ _global_script_classes=[ {
 "path": "res://source/grog/core/room_resource.gd"
 } ]
 _global_script_class_icons={
+"CompiledGrogScript": "",
 "GameResource": "",
+"GrogCompiler": "",
+"GrogScript": "",
 "RoomResource": ""
 }
 
 [application]
 
 config/name="Grog"
-run/main_scene="res://apps/scene_tester/scene_tester.tscn"
+run/main_scene="res://apps/room_tester/room_tester.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+grog_server="*res://source/grog/core/grog_server.gd"
 
 [display]
 
 window/size/width=1366
 window/size/height=768
+
+[locale]
+
+translations=PoolStringArray( "res://apps/room_tester/translations.en.translation", "res://apps/room_tester/translations.es.translation" )
 
 [rendering]
 

@@ -1,0 +1,16 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+
+[deps]
+
+files=[ "res://apps/room_tester/translations.en.translation", "res://apps/room_tester/translations.es.translation" ]
+
+source_file="res://apps/room_tester/translations.csv"
+dest_files=[ "res://apps/room_tester/translations.en.translation", "res://apps/room_tester/translations.es.translation" ]
+
+[params]
+
+compress=true
+delimiter=2

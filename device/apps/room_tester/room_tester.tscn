@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://games/demo_game/demo_game.tres" type="Resource" id=1]
+[ext_resource path="res://source/label.gd" type="Script" id=2]
+[ext_resource path="res://apps/room_tester/room_tester.gd" type="Script" id=3]
+[ext_resource path="res://games/demo_game/display/display.tscn" type="PackedScene" id=4]
+[ext_resource path="res://apps/room_tester/room_list.tscn" type="PackedScene" id=5]
+
+[node name="room_tester" type="Node"]
+script = ExtResource( 3 )
+game_to_load = ExtResource( 1 )
+
+[node name="ui" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_bottom = 6.10352e-05
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="room_list" parent="ui" instance=ExtResource( 5 )]
+
+[node name="test_room_button" type="Button" parent="ui"]
+margin_left = 577.393
+margin_top = 535.904
+margin_right = 818.393
+margin_bottom = 612.904
+text = "ROOM_TESTER_TEST_ROOM"
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="play_game_button" type="Button" parent="ui"]
+margin_left = 202.215
+margin_top = 528.745
+margin_right = 443.215
+margin_bottom = 605.745
+text = "ROOM_TESTER_PLAY_GAME"
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="display" parent="." instance=ExtResource( 4 )]
+visible = false
+room_place_path = NodePath("../../room_tester/display/room_area/room_container/room_anchor")
+[connection signal="pressed" from="ui/test_room_button" to="." method="_on_test_room_button_pressed"]
+[connection signal="pressed" from="ui/play_game_button" to="." method="_on_play_game_button_pressed"]

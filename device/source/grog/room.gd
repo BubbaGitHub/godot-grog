@@ -21,3 +21,5 @@ func start_room():
 	
 	player_anim.play(anim_name)
 	
+func _ready():
+	pass
