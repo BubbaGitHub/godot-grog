@@ -31,9 +31,8 @@ func process(delta):
 		
 	elif state == GameState.DoingSomething:
 		if become_idle_when != null:
-			var now_seconds = OS.get_time().second
-			if become_idle_when <= now_seconds:
-				
+			var current_time = get_current_time()
+			if become_idle_when <= current_time:
 				state = GameState.Idle
 				become_idle_when = null
 		
@@ -73,11 +72,14 @@ func run_instruction(inst: Dictionary):
 			var time_param = inst.params[0]
 			var delay_seconds = float(time_param)
 			state = GameState.DoingSomething
-			become_idle_when = OS.get_time().second + delay_seconds
+			
+			# TODO use Timer's instead of polling
+			var current = get_current_time()
+			become_idle_when = within_seconds(current, delay_seconds)
 			
 		_:
 			print("Unknown instruction '%s'" % inst.command)
-		
+
 
 func push_actions(action_list):
 	for a in action_list:
@@ -122,3 +124,11 @@ func get_resource_in(list, elem_name):
 		if elem.get_name() == elem_name:
 			return elem
 	return null
+
+#######
+
+func get_current_time():
+	return OS.get_ticks_msec()
+
+func within_seconds(current_time, seconds):
+	return current_time + 1000 * seconds
