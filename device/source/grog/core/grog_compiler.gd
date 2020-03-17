@@ -82,6 +82,10 @@ func identify_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 	for i in range(lines.size()):
 		var line = lines[i]
 		
+		if line.indent_level != 0:
+			compiled_script.add_error("Indentation levels not implemented (line %s)" % line.line_number)
+			line.valid = false
+		
 		for j in range(line.tokens.size()):
 			var token = line.tokens[j]
 			

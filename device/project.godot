@@ -56,7 +56,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-grog_server="*res://source/grog/core/grog_server.gd"
+grog="*res://source/grog/core/grog.gd"
 
 [display]
 

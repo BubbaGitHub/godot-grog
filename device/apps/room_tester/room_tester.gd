@@ -47,7 +47,7 @@ func _on_play_game_button_pressed():
 	
 	var script = scripts[0]
 	
-	var compiled_script = grog_server.compile(script)
+	var compiled_script = grog.compile(script)
 	if not compiled_script.is_valid:
 		print("Script is invalid")
 		
@@ -66,5 +66,7 @@ func play_game(compiled_script):
 	_ui.hide()
 	_display.show()
 	
-	_grog_game = grog_server.new_game(game_to_load, compiled_script, _display)
+	_grog_game = grog.new_game_server(game_to_load, compiled_script, _display)
+	
+	
 	
