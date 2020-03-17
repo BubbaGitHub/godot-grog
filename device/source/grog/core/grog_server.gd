@@ -36,7 +36,8 @@ func process(delta):
 				state = GameState.Idle
 				become_idle_when = null
 		
-		
+
+
 func run_instruction(inst: Dictionary):
 	if inst.subject:
 		print("Unknown subject '%s'" % inst.subject)
@@ -80,6 +81,29 @@ func run_instruction(inst: Dictionary):
 		_:
 			print("Unknown instruction '%s'" % inst.command)
 
+func run_script(script_name: String, routine_name: String):
+	var script_resource = get_script_resource(script_name)
+	
+	if not script_resource:
+		print("No script '%s'" % script_name)
+		return
+	
+	var compiled_script = grog.compile(script_resource)
+	if not compiled_script.is_valid:
+		print("Script '%s' is invalid")
+		
+		compiled_script.print_errors()
+		return
+	
+	run_compiled(compiled_script, routine_name)
+
+func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
+	if compiled_script.has_routine(routine_name):
+		var instructions = compiled_script.get_routine(routine_name)
+
+		push_actions(instructions)
+	else:
+		print("Routine '%s' not found" % routine_name)
 
 func push_actions(action_list):
 	for a in action_list:
@@ -111,11 +135,16 @@ func load_room(room_name: String, actor_name):
 	return room
 
 
+#### Loading resources
+
 func get_room(room_name):
 	return get_resource_in(data.get_all_rooms(), room_name)
 
 func get_actor(actor_name):
 	return get_resource_in(data.get_all_actors(), actor_name)
+
+func get_script_resource(script_name):
+	return get_resource_in(data.get_all_scripts(), script_name)
 
 func get_resource_in(list, elem_name):
 	for i in range(list.size()):

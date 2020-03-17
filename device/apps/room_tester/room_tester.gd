@@ -40,33 +40,28 @@ func _on_test_room_button_pressed():
 	test_room(current_room)
 
 func _on_play_game_button_pressed():
+	play_game()
+	
 	var scripts = game_to_load.get_all_scripts()
 	
 	if not scripts:
 		return
 	
+	# TODO this should be in another place
 	var script = scripts[0]
-	
-	var compiled_script = grog.compile(script)
-	if not compiled_script.is_valid:
-		print("Script is invalid")
-		
-		compiled_script.print_errors()
-	else:
-		play_game(compiled_script)
-	
+	_grog_game.run_script(script.get_name(), "start")
+
 func test_room(_room_resource):
+	play_game()
+
 	var compiled_script = CompiledGrogScript.new()
-	
 	compiled_script.add_routine("start", [ { subject = "", command = "load_room", params = [_room_resource.get_name()] } ])
 	
-	play_game(compiled_script)
+	_grog_game.run_compiled(compiled_script, "start")
 
-func play_game(compiled_script):
+func play_game():
 	_ui.hide()
 	_display.show()
 	
-	_grog_game = grog.new_game_server(game_to_load, compiled_script, _display)
-	
-	
+	_grog_game = grog.new_game_server(game_to_load, _display)
 	
