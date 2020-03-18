@@ -3,9 +3,10 @@
 [ext_resource path="res://source/grog/core/game_resource.gd" type="Script" id=1]
 [ext_resource path="res://games/demo_game/rooms/room1/demo_room.tres" type="Resource" id=2]
 [ext_resource path="res://games/demo_game/rooms/room2/demo_room2.tres" type="Resource" id=3]
-[ext_resource path="res://source/grog/core/grog_server.gd" type="Script" id=4]
+[ext_resource path="res://source/grog/core/game_server.gd" type="Script" id=4]
 [ext_resource path="res://games/demo_game/demo_game_main_script.tres" type="Resource" id=5]
 [ext_resource path="res://games/demo_game/actors/guybrush/guybrush.tres" type="Resource" id=6]
+
 
 [resource]
 script = ExtResource( 1 )

@@ -1,6 +1,6 @@
 
 # server to client signals
-signal grog_server_event
+signal game_server_event
 
 var data
 
@@ -196,7 +196,7 @@ func walk_to(actor, target_position):
 ##############################
 
 func server_event(event_name: String, args: Array = []):
-	emit_signal("grog_server_event", event_name, args)
+	emit_signal("game_server_event", event_name, args)
 
 #### Client calls
 
