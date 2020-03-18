@@ -9,7 +9,7 @@ func get_compiler():
 	return GrogCompiler.new()
 
 func _process(delta):
-	if game and game.started:
+	if game and game.has_started():
 		game.process(delta)
 
 #	@PUBLIC

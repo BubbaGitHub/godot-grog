@@ -5,20 +5,11 @@ signal grog_server_event
 var data
 
 # State
-
 var globals = {}
-
-var started = false
-var state = grog.GameState.Idle
-var total_time = 0.0
 var current_room = null
 var current_player = null
 
-# Private
-
-var pending_actions = []
-var become_idle_when = null
-var routine = null
+var event_queue : EventQueue = EventQueue.new()
 
 func init_game(game_data: Resource):
 	data = game_data
@@ -48,56 +39,14 @@ func start_from_compiled_script(compiled_script: CompiledGrogScript):
 	run_compiled(compiled_script, "start")
 
 func start_game():
-	started = true
-	total_time = 0
 	server_event("start_game", [self])
-	routine = coroutine()
+	event_queue.start(self)
 
 func process(delta):
-	total_time += delta
-	
-	if routine:
-		routine = routine.resume()
-
-func coroutine():
-	state = grog.GameState.Idle
-	
-	while true:
-		yield()
-		
-		while not pending_actions:
-			yield()
-		
-		# there are pending actions
-		set_busy()
-		
-		while true:
-			var next_action = pending_actions.pop_front()
-			
-			var is_blocking = run_instruction(next_action)
-	
-			if is_blocking:
-				# Start blocking action
-				while true:
-					yield()
-					var current_time = get_current_time()
-					if become_idle_when <= current_time:
-						break
-				# End of blocking action
-				
-			if not pending_actions:
-				set_ready()
-				break
+	event_queue.process(delta)
 
 func set_ready():
-	state = grog.GameState.Idle
 	server_event("ready")
-
-func set_busy():
-	state = grog.GameState.DoingSomething
-	
-func is_ready():
-	return started and state == grog.GameState.Idle
 
 ##############################
 
@@ -124,24 +73,22 @@ func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
 	if compiled_script.has_routine(routine_name):
 		var instructions = compiled_script.get_routine(routine_name)
 
-		push_actions(instructions)
+		event_queue.push_actions(instructions)
 	else:
 		print("Routine '%s' not found" % routine_name)
 
-func push_actions(action_list):
-	for a in action_list:
-		pending_actions.push_back(a)
-
-func run_instruction(inst: Dictionary) -> bool:
+func run_instruction(inst: Dictionary) -> Dictionary:
+	var ret = { block = false }
+	
 	if inst.subject:
 		print("Unknown subject '%s'" % inst.subject)
-		return false
+		return ret
 	
 	match inst.command:
 		"load_room":
 			if inst.params.size() < 1:
 				print("One parameter needed for load_room")
-				return false
+				return ret
 			
 			var room_name = inst.params[0]
 			var actor_name = ""
@@ -154,7 +101,7 @@ func run_instruction(inst: Dictionary) -> bool:
 			
 			if not room:
 				print("Couldn't load room '%s'" % room_name)
-				return false
+				return ret
 		"show_controls":
 			server_event("show_controls")
 		"hide_controls":
@@ -162,20 +109,20 @@ func run_instruction(inst: Dictionary) -> bool:
 		"wait":
 			if inst.params.size() < 1:
 				print("One parameter needed for wait")
-				return false
+				return ret
 			
 			var time_param = inst.params[0]
 			var delay_seconds = float(time_param)
 			
 			server_event("start_waiting", [delay_seconds])
 			
-			wait(delay_seconds)
-			return true
+			ret.block = true
+			ret.delay = delay_seconds
 			
 		"say":
 			if inst.params.size() < 1:
 				print("One parameter needed for say")
-				return false
+				return ret
 			
 			# TODO make this configurable and skipping
 			var delay_seconds = 1.0
@@ -183,21 +130,15 @@ func run_instruction(inst: Dictionary) -> bool:
 			var speech = inst.params[0]
 			server_event("say", [speech, delay_seconds])
 			
-			wait(delay_seconds)
-			return true
-		
+			ret.block = true
+			ret.delay = delay_seconds
+
 		_:
 			print("Unknown instruction '%s'" % inst.command)
-			return false
-	return false
+
+	return ret
 
 ##############################
-
-func wait(delay_seconds):
-	state = grog.GameState.DoingSomething
-	
-	var current = get_current_time()
-	become_idle_when = within_seconds(current, delay_seconds)
 
 func load_room(room_name: String, actor_name: String) -> Node:
 	var room_resource = get_room(room_name)
@@ -259,8 +200,14 @@ func server_event(event_name: String, args: Array = []):
 
 #### Client calls
 
+func is_ready():
+	return event_queue.is_ready()
+
+func has_started():
+	return event_queue.started
+	
 func left_click(target_position: Vector2):
-	if not is_ready():
+	if not event_queue.is_ready():
 		print("Rejecting click")
 		return
 	
@@ -288,10 +235,3 @@ func get_resource_in(list, elem_name):
 			return elem
 	return null
 
-####### Time
-
-func get_current_time():
-	return OS.get_ticks_msec()
-
-func within_seconds(current_time, seconds):
-	return current_time + 1000 * seconds

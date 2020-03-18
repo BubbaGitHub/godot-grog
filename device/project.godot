@@ -19,6 +19,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://source/grog/core/compiled_grog_script.gd"
 }, {
+"base": "Reference",
+"class": "EventQueue",
+"language": "GDScript",
+"path": "res://source/grog/core/event_queue.gd"
+}, {
 "base": "Resource",
 "class": "GameResource",
 "language": "GDScript",
@@ -42,6 +47,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "ActorResource": "",
 "CompiledGrogScript": "",
+"EventQueue": "",
 "GameResource": "",
 "GrogCompiler": "",
 "GrogScript": "",
