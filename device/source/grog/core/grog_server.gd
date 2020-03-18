@@ -14,13 +14,41 @@ var become_idle_when = null
 
 var routine = null
 
-func start_game(game_data: Resource):
+var started = false
+
+func init_game(game_data: Resource):
 	data = game_data
-	
 	globals = {}
-	
 	pending_actions = []
+
+func start_default():
+	start_game()
+	
+	var scripts = data.get_all_scripts()
+	
+	if not scripts:
+		print("Game data has no scripts")
+		return
+	
+	if not scripts:
+		print("Game data has no scripts")
+		return
+	
+	if not scripts:
+		print("Game data has no scripts")
+		return
+	
+	var script = scripts[0]
+	run_script(script, "start")
+
+func start_from_compiled_script(compiled_script: CompiledGrogScript):
+	start_game()
+	run_compiled(compiled_script, "start")
+
+func start_game():
+	started = true
 	total_time = 0
+	server_event("start_game", [self])
 	routine = coroutine()
 
 func process(delta):
@@ -125,13 +153,16 @@ func wait(delay_seconds):
 	var current = get_current_time()
 	become_idle_when = within_seconds(current, delay_seconds)
 
-func run_script(script_name: String, routine_name: String):
+func run_script_named(script_name: String, routine_name: String):
 	var script_resource = get_script_resource(script_name)
 	
 	if not script_resource:
 		print("No script '%s'" % script_name)
 		return
 	
+	run_script(script_resource, routine_name)
+
+func run_script(script_resource: Resource, routine_name: String):
 	var compiled_script = grog.compile(script_resource)
 	if not compiled_script.is_valid:
 		print("Script '%s' is invalid")

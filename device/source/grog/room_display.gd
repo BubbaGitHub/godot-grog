@@ -6,13 +6,20 @@ export (NodePath) var controls_place_path
 
 export (bool) var update_layout = false
 
+# State
+var _server
+var _current_room: Node2D
+var _state = grog.GameState.DoingSomething
+
+# Input
+enum InputState { Nothing, DoingLeftClick }
+var input_state = InputState.Nothing
+var input_position = null
+
+# Node hooks
 var _room_place: Control
 var _text_place: RichTextLabel
 var _controls_place: Control
-
-
-var _current_room: Node2D
-var _state = grog.GameState.DoingSomething
 
 func _ready():
 	_room_place = get_node(room_place_path)
@@ -23,11 +30,33 @@ func _ready():
 	if ret:
 		push_error("Couldn't connect 'size_changed' in root")
 
+func _input(event):
+	if _state != grog.GameState.Idle:
+		return
+	
+	if event is InputEventMouseButton: 
+		if event.pressed:
+			if input_state == InputState.Nothing:
+				input_state = InputState.DoingLeftClick
+				input_position = event.position
+		else:
+			if input_state == InputState.DoingLeftClick:
+				# TODO give it some threshold!
+				# currently only exact clicks work
+				
+				if event.position == input_position:
+					left_click(input_position)
+				
+				input_state = InputState.Nothing
+
 func on_server_event(event_name, args):
 	if self.has_method(event_name):
 		self.callv(event_name, args)
 	else:
 		push_warning("Unknown event '%s'" % event_name)
+
+func start_game(p_server):
+	_server = p_server
 
 func load_room(room):
 	make_empty(_room_place)
@@ -68,6 +97,13 @@ func ready():
 	_state = grog.GameState.Idle
 	
 	_show_controls()
+
+#	@PRIVATE
+
+func left_click(at_position):
+	print("Click %s" % at_position)
+	
+	
 
 func _show_controls():
 	if _controls_place:

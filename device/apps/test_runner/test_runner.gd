@@ -7,6 +7,8 @@ func _ready():
 	compiler = GrogCompiler.new()
 	test_tokenize()
 	
+	get_tree().quit()
+	
 func check_action(action_string):
 	var regex = RegEx.new()
 	regex.compile("^\\:?([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$")
@@ -91,9 +93,6 @@ func test_tokenize():
 		{ indent_level = 0, tokens = ["#tok#en#"]}
 	)
 	
-	get_tree().quit()
-
-	
 func test_compile(test_name, raw_line, expected_valid, expected_result = null):
 	print()
 	print("Testing '%s':" % test_name)
@@ -103,7 +102,7 @@ func test_compile(test_name, raw_line, expected_valid, expected_result = null):
 	var compiled_script = CompiledGrogScript.new()
 	var c_line = { line_number = 1, raw = raw_line }
 	
-	grog_server.get_compiler().tokenize(compiled_script, c_line)
+	grog.get_compiler().tokenize(compiled_script, c_line)
 	
 	var actual_valid = c_line.valid
 	

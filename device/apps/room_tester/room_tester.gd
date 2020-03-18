@@ -42,22 +42,15 @@ func _on_test_room_button_pressed():
 func _on_play_game_button_pressed():
 	play_game()
 	
-	var scripts = game_to_load.get_all_scripts()
+	_grog_game.start_default()
 	
-	if not scripts:
-		return
-	
-	# TODO this should be in another place
-	var script = scripts[0]
-	_grog_game.run_script(script.get_name(), "start")
-
 func test_room(_room_resource):
 	play_game()
 
 	var compiled_script = CompiledGrogScript.new()
 	compiled_script.add_routine("start", [ { subject = "", command = "load_room", params = [_room_resource.get_name()] } ])
 	
-	_grog_game.run_compiled(compiled_script, "start")
+	_grog_game.start_from_compiled_script(compiled_script)
 
 func play_game():
 	_ui.hide()

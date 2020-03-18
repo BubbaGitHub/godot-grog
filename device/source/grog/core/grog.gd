@@ -9,7 +9,7 @@ func get_compiler():
 	return GrogCompiler.new()
 
 func _process(delta):
-	if game:
+	if game and game.started:
 		game.process(delta)
 
 #	@PUBLIC
@@ -17,7 +17,7 @@ func _process(delta):
 func new_game_server(game_data: Resource) -> Object:
 	game = game_data.game_server_model.new()
 	
-	game.start_game(game_data)
+	game.init_game(game_data)
 
 	return game
 
