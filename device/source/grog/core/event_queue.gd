@@ -13,6 +13,7 @@ var routine = null
 
 func start(p_target):
 	target = p_target
+	
 	started = true
 	total_time = 0.0
 	
@@ -39,7 +40,7 @@ func coroutine():
 		while true:
 			var next_action = pending_actions.pop_front()
 			
-			var event_result = target.run_instruction(next_action)
+			var event_result = target.do_action(next_action)
 			
 			if event_result.block:
 				var current = get_current_time()
@@ -69,16 +70,12 @@ func is_ready():
 
 #####################
 
+func push_action(action):
+	pending_actions.push_back(action)
+	
 func push_actions(action_list):
-	for a in action_list:
-		pending_actions.push_back(a)
-
-#####################
-
-#func wait(delay_seconds):
-#	state = grog.GameState.DoingSomething
-#	var current = get_current_time()
-#	become_idle_when = within_seconds(current, delay_seconds)
+	for action in action_list:
+		push_action(action)
 
 ####### Time
 

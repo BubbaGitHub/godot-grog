@@ -1,4 +1,4 @@
-[gd_scene load_steps=80 format=2]
+[gd_scene load_steps=81 format=2]
 
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/00.png" type="Texture" id=1]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/01.png" type="Texture" id=2]
@@ -65,6 +65,7 @@
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/63.png" type="Texture" id=63]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/64.png" type="Texture" id=64]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/65.png" type="Texture" id=65]
+[ext_resource path="res://source/grog/core/item.gd" type="Script" id=66]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -277,6 +278,7 @@ tracks/0/keys = {
 }
 
 [node name="guybrush" type="Node2D"]
+script = ExtResource( 66 )
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )

@@ -77,7 +77,7 @@ func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
 	else:
 		print("Routine '%s' not found" % routine_name)
 
-func run_instruction(inst: Dictionary) -> Dictionary:
+func do_action(inst: Dictionary) -> Dictionary:
 	var ret = { block = false }
 	
 	if inst.subject:
@@ -191,7 +191,15 @@ func walk_to(actor, target_position):
 	var relative_target_position = target_position - nav.global_position
 	var relative_final_target = nav.get_closest_point(relative_target_position)
 	
-	actor.position = relative_final_target
+	var current_position = actor.position
+	
+	var path = nav.get_simple_path(current_position, relative_final_target)
+	
+	var debug_node = current_room.get_debug_node()
+	if debug_node:
+		debug_node.draw_points(path)
+	
+	actor.walk(path)
 
 ##############################
 

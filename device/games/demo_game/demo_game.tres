@@ -7,7 +7,6 @@
 [ext_resource path="res://games/demo_game/demo_game_main_script.tres" type="Resource" id=5]
 [ext_resource path="res://games/demo_game/actors/guybrush/guybrush.tres" type="Resource" id=6]
 
-
 [resource]
 script = ExtResource( 1 )
 scripts = [ ExtResource( 5 ) ]
