@@ -1,16 +1,21 @@
 extends Node
 
 export (NodePath) var room_place_path
+export (NodePath) var text_place_path
 export (NodePath) var controls_place_path
 
 export (bool) var update_layout = false
 
 var _room_place: Control
+var _text_place: RichTextLabel
 var _controls_place: Control
+
+
 var _current_room: Node2D
 
 func _ready():
 	_room_place = get_node(room_place_path)
+	_text_place = get_node(text_place_path)
 	_controls_place = get_node(controls_place_path)
 	
 	var ret = get_tree().get_root().connect("size_changed", self, "on_viewport_resized")
@@ -39,12 +44,32 @@ func load_actor(actor):
 	
 	actor_place.add_child(actor) 
 
+func start_waiting(seconds):
+	# start waiting 'seconds' seconds
+	
+	_hide_controls()
 
-func show_controls():
+func say(speech, _seconds):
+	# start waiting '_seconds' seconds
+	
+	_hide_controls()
+	_text_place.clear()
+	_text_place.push_color(Color.red)
+	_text_place.push_align(RichTextLabel.ALIGN_CENTER)
+	_text_place.add_text(speech)
+	_text_place.pop()
+	_text_place.pop()
+	
+func ready():
+	# end waiting
+	
+	_show_controls()
+
+func _show_controls():
 	if _controls_place:
 		_controls_place.show()
 
-func hide_controls():
+func _hide_controls():
 	if _controls_place:
 		_controls_place.hide()
 
@@ -69,3 +94,4 @@ func make_empty(node):
 		var first_child = node.get_child(0)
 		node.remove_child(first_child)
 		first_child.queue_free()
+

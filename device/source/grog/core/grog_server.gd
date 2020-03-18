@@ -13,42 +13,85 @@ var total_time
 
 var become_idle_when = null
 
+var routine = null
+
 func start_game(game_data: Resource):
 	data = game_data
 	
 	globals = {}
 	
 	pending_actions = []
-	state = GameState.Idle
 	total_time = 0
+	routine = coroutine()
 
 func process(delta):
 	total_time += delta
 	
-	if state == GameState.Idle and pending_actions:
-		var next = pending_actions.pop_front()
+	if routine:
+		routine = routine.resume()
+
+
+func coroutine():
+	while true:
+		state = GameState.Idle
+		yield()
 		
-		run_instruction(next)
+		while not pending_actions:
+			yield()
 		
-	elif state == GameState.DoingSomething:
-		if become_idle_when != null:
-			var current_time = get_current_time()
-			if become_idle_when <= current_time:
-				state = GameState.Idle
-				become_idle_when = null
+		# there are pending actions
+		state = GameState.DoingSomething
+		
+		while true:
+			var next_action = pending_actions.pop_front()
+			
+			var is_blocking = run_instruction(next_action)
+	
+			if is_blocking:
+				# Start blocking action
+				while true:
+					yield()
+					var current_time = get_current_time()
+					if become_idle_when <= current_time:
+						break
+				# End of blocking action
+				
+			if not pending_actions:
+				server_event("ready")
+				break
+		
+		# it's ready again
+#	if state == GameState.DoingSomething:
+#		var current_time = get_current_time()
+#		if become_idle_when <= current_time:
+#
+	
+	
+	
+#	if state == GameState.Idle and pending_actions:
+#		var next = pending_actions.pop_front()
+#
+#		var is_blocking = run_instruction(next)
+#
+#	elif state == GameState.DoingSomething:
+#		if become_idle_when != null:
+#			var current_time = get_current_time()
+#			if become_idle_when <= current_time:
+#				state = GameState.Idle
+#				become_idle_when = null
 		
 
 
-func run_instruction(inst: Dictionary):
+func run_instruction(inst: Dictionary) -> bool:
 	if inst.subject:
 		print("Unknown subject '%s'" % inst.subject)
-		return
+		return false
 	
 	match inst.command:
 		"load_room":
 			if inst.params.size() < 1:
 				print("One parameter needed for load_room")
-				return
+				return false
 			
 			var room_name = inst.params[0]
 			var actor_name = ""
@@ -61,7 +104,7 @@ func run_instruction(inst: Dictionary):
 			
 			if not room:
 				print("Couldn't load room '%s'" % room_name)
-				return
+				return false
 		"show_controls":
 			server_event("show_controls")
 		"hide_controls":
@@ -69,18 +112,41 @@ func run_instruction(inst: Dictionary):
 		"wait":
 			if inst.params.size() < 1:
 				print("One parameter needed for wait")
-				return
+				return false
 			
 			var time_param = inst.params[0]
 			var delay_seconds = float(time_param)
-			state = GameState.DoingSomething
 			
-			# TODO use Timer's instead of polling
-			var current = get_current_time()
-			become_idle_when = within_seconds(current, delay_seconds)
+			server_event("start_waiting", [delay_seconds])
 			
+			wait(delay_seconds)
+			return true
+			
+		"say":
+			if inst.params.size() < 1:
+				print("One parameter needed for say")
+				return false
+			
+			# TODO make this configurable and skipping
+			var delay_seconds = 1.0
+			
+			var speech = inst.params[0]
+			server_event("say", [speech, delay_seconds])
+			
+			wait(delay_seconds)
+			return true
+		
 		_:
 			print("Unknown instruction '%s'" % inst.command)
+			return false
+	return false
+
+func wait(delay_seconds):
+	state = GameState.DoingSomething
+	
+	# TODO use Timer's instead of polling
+	var current = get_current_time()
+	become_idle_when = within_seconds(current, delay_seconds)
 
 func run_script(script_name: String, routine_name: String):
 	var script_resource = get_script_resource(script_name)
