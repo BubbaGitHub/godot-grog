@@ -1,6 +1,8 @@
-var data
-var display
 
+# server to client signals
+signal grog_server_event
+
+var data
 var globals
 
 var pending_actions : Array
@@ -11,9 +13,8 @@ var total_time
 
 var become_idle_when = null
 
-func start_game(game_data: Resource, p_display: Node):
+func start_game(game_data: Resource):
 	data = game_data
-	display = p_display
 	
 	globals = {}
 	
@@ -50,7 +51,7 @@ func run_instruction(inst: Dictionary):
 				return
 			
 			var room_name = inst.params[0]
-			var actor_name = null
+			var actor_name = ""
 			if inst.params.size() >= 2:
 				var actor_param = inst.params[1]
 				if actor_param.begins_with("player="):
@@ -62,9 +63,9 @@ func run_instruction(inst: Dictionary):
 				print("Couldn't load room '%s'" % room_name)
 				return
 		"show_controls":
-			display.show_controls()
+			server_event("show_controls")
 		"hide_controls":
-			display.hide_controls()
+			server_event("hide_controls")
 		"wait":
 			if inst.params.size() < 1:
 				print("One parameter needed for wait")
@@ -109,33 +110,48 @@ func push_actions(action_list):
 	for a in action_list:
 		pending_actions.push_back(a)
 
-func load_room(room_name: String, actor_name):
+func load_room(room_name: String, actor_name: String) -> Node:
 	var room_resource = get_room(room_name)
 	if not room_resource:
 		print("No room '%s'" % room_name)
 		return null
 	
-	var actor_resource = null
+	if not room_resource.room_scene:
+		print("No room_scene in room '%s'" % room_name)
+		return null
+	
+	var room = room_resource.room_scene.instance()
+	
+	if not room:
+		push_error("Couldn't load room '%s'"  % room_name)
+		return null
+	
+	server_event("load_room", [room])
 	
 	if actor_name:
-		actor_resource = get_actor(actor_name)
+		var actor_resource = get_actor(actor_name)
 		if not actor_resource:
 			print("No actor '%s'" % actor_name)
-			#return null
-			
-	var room = display.load_room(room_resource)
-	
-	if actor_resource:
-		display.load_player(actor_resource)
-	
-	# room is ready here
-	# TODO schedule it...
-	# state = GameState.Idle
+			return null
+		
+		if not actor_resource.actor_scene:
+			print("No actor_scene in actor '%s'" % actor_name)
+			return null
+		
+		var actor = actor_resource.actor_scene.instance()
+		
+		if not room:
+			push_error("Couldn't load actor '%s'"  % actor_name)
+			return null
+		
+		server_event("load_actor", [actor])
 	
 	return room
 
+func server_event(event_name: String, args: Array = []):
+	emit_signal("grog_server_event", event_name, args)
 
-#### Loading resources
+#### Finding resources
 
 func get_room(room_name):
 	return get_resource_in(data.get_all_rooms(), room_name)
@@ -154,7 +170,7 @@ func get_resource_in(list, elem_name):
 			return elem
 	return null
 
-#######
+####### Time
 
 func get_current_time():
 	return OS.get_ticks_msec()

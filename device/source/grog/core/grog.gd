@@ -12,10 +12,10 @@ func _process(delta):
 
 #	@PUBLIC
 
-func new_game_server(game_data: Resource, display: Node) -> Object:
+func new_game_server(game_data: Resource) -> Object:
 	game = game_data.game_server_model.new()
 	
-	game.start_game(game_data, display)
+	game.start_game(game_data)
 
 	return game
 

@@ -8,36 +8,22 @@ export (bool) var update_layout = false
 var _room_place: Control
 var _controls_place: Control
 var _current_room: Node2D
-var _current_player: Node2D
 
 func _ready():
 	_room_place = get_node(room_place_path)
 	_controls_place = get_node(controls_place_path)
 	
-	#ignore-warning:return_value_discarded
-	var _ret = get_tree().get_root().connect("size_changed", self, "on_viewport_resized")
-	
-	# TODO _ret
+	var ret = get_tree().get_root().connect("size_changed", self, "on_viewport_resized")
+	if ret:
+		push_error("Couldn't connect 'size_changed' in root")
 
-func load_player(actor_resource):
-	
-	var player_place = _current_room.get_player_place()
-	var actor_scene = actor_resource.actor_scene
-	var player : Node2D = actor_scene.instance()
-	
-	make_empty(player_place)
-	
-	_current_player = player
-	
-	player_place.add_child(player)
-	
-	
-func load_room(room_to_load : Resource) -> Node:
-	var room_scene = room_to_load.room_scene
-	
-	var room : Node2D = room_scene.instance()
-	
-	# makes _room_place empty
+func on_server_event(event_name, args):
+	if self.has_method(event_name):
+		self.callv(event_name, args)
+	else:
+		push_warning("Unknown event '%s'" % event_name)
+
+func load_room(room):
 	make_empty(_room_place)
 	
 	_current_room = room
@@ -46,7 +32,13 @@ func load_room(room_to_load : Resource) -> Node:
 	
 	update_room_layout()
 	
-	return room
+func load_actor(actor):
+	var actor_place = _current_room.get_player_place()
+	
+	make_empty(actor_place)
+	
+	actor_place.add_child(actor) 
+
 
 func show_controls():
 	if _controls_place:
@@ -70,7 +62,7 @@ func on_viewport_resized():
 	
 	update_room_layout()
 
-#####
+##### Misc
 
 func make_empty(node):
 	while node.get_child_count():

@@ -63,5 +63,6 @@ func play_game():
 	_ui.hide()
 	_display.show()
 	
-	_grog_game = grog.new_game_server(game_to_load, _display)
+	_grog_game = grog.new_game_server(game_to_load)
+	_grog_game.connect("grog_server_event", _display, "on_server_event")
 	
