@@ -3,6 +3,12 @@ extends Node
 # TODO
 var game = null
 
+var tree
+
+func _enter_tree():
+	# TODO
+	tree = get_tree()
+
 enum GameState { Idle, DoingSomething }
 
 func get_compiler():

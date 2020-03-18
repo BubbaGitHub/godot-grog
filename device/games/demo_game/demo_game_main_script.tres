@@ -8,21 +8,22 @@ code_or_filename = "# example grog file
 
 :start
 
+.wait 1 seconds
+
+.load_room \"room1\"
+
+.wait 1 seconds
+
+.load_actor guybrush
+
+.wait 1 seconds
+
+bust.say \"Hi\"
+bust.say \"How are you?\"
+
+guybrush.say \"Fine\"
+
+.wait 1 seconds
+
 .load_room \"room2\"
-.wait 1 seconds
-
-.say \"A long long time ago...\"
-
-#bust.say \"What happened?\"
-#.wait 1 seconds
-
-.load_room \"room1\" player=guybrush
-
-.wait 1 seconds
-
-.say \"This place reminds me of something\"
-#.wait 1 seconds
-
-.say \"Nothing\"
-
 "

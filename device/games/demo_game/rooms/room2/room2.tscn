@@ -21,7 +21,7 @@ navigation_path = NodePath("../room2/Navigation2D")
 position = Vector2( -640, 0 )
 
 [node name="background" type="Sprite" parent="background"]
-modulate = Color( 0.160784, 0.172549, 0.827451, 1 )
+modulate = Color( 0.44, 0.449333, 1, 1 )
 texture = ExtResource( 1 )
 centered = false
 

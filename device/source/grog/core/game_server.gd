@@ -1,3 +1,4 @@
+extends Node
 
 # server to client signals
 signal game_server_event
@@ -10,6 +11,8 @@ var current_room = null
 var current_player = null
 
 var event_queue : EventQueue = EventQueue.new()
+
+const empty_action = { block = false }
 
 func init_game(game_data: Resource):
 	data = game_data
@@ -77,70 +80,100 @@ func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
 	else:
 		print("Routine '%s' not found" % routine_name)
 
-func do_action(inst: Dictionary) -> Dictionary:
-	var ret = { block = false }
-	
-	if inst.subject:
-		print("Unknown subject '%s'" % inst.subject)
-		return ret
-	
-	match inst.command:
-		"load_room":
-			if inst.params.size() < 1:
-				print("One parameter needed for load_room")
-				return ret
-			
-			var room_name = inst.params[0]
-			var actor_name = ""
-			if inst.params.size() >= 2:
-				var actor_param = inst.params[1]
-				if actor_param.begins_with("player="):
-					actor_name = actor_param.substr(len("player="))
+func do_action(action: Dictionary) -> Dictionary:
+	if action.subject:
+		var item = get_item_named(action.subject)
+		if not item:
+			print("Unknown subject '%s'" % action.subject)
+			return empty_action
+		
+		if not item.is_active():
+			print("Item '%s' is inactive" % action.subject)
+			return empty_action
+		
+		return do_item_action(item, action)
+	else:
+		return do_global_action(action)
 
-			var room = load_room(room_name, actor_name)
+func do_global_action(action: Dictionary) -> Dictionary:
+	var params = action.params
+	match action.command:
+		"load_room":
+			if params.size() < 1:
+				print("One parameter needed for load_room")
+				return empty_action
+			
+			var room_name = params[0]
+			
+			var room = load_room(room_name)
 			
 			if not room:
 				print("Couldn't load room '%s'" % room_name)
-				return ret
+		
+		"load_actor":
+			if params.size() < 1:
+				print("One parameter needed for load_actor")
+				return empty_action
+			
+			var actor_name = params[0]
+			
+			var actor = load_actor(actor_name)
+			
+			if not actor:
+				print("Couldn't load actor '%s'" % actor_name)
+		
 		"show_controls":
 			server_event("show_controls")
+			
 		"hide_controls":
 			server_event("hide_controls")
-		"wait":
-			if inst.params.size() < 1:
-				print("One parameter needed for wait")
-				return ret
 			
-			var time_param = inst.params[0]
+		"wait":
+			if params.size() < 1:
+				print("One parameter needed for wait")
+				return empty_action
+			
+			var time_param = params[0]
 			var delay_seconds = float(time_param)
 			
 			server_event("start_waiting", [delay_seconds])
 			
-			ret.block = true
-			ret.delay = delay_seconds
+			return { block = true, delay = delay_seconds }
 			
 		"say":
-			if inst.params.size() < 1:
-				print("One parameter needed for say")
-				return ret
-			
-			# TODO make this configurable and skipping
-			var delay_seconds = 1.0
-			
-			var speech = inst.params[0]
-			server_event("say", [speech, delay_seconds])
-			
-			ret.block = true
-			ret.delay = delay_seconds
-
+			return say(null, params)
+		
 		_:
-			print("Unknown instruction '%s'" % inst.command)
+			print("Unknown instruction '%s'" % action.command)
 
-	return ret
+	return empty_action
+
+func do_item_action(item: Node, action: Dictionary) -> Dictionary:
+	var params = action.params
+	match action.command:
+		"say":
+			return say(item, params)
+
+	return empty_action
 
 ##############################
 
-func load_room(room_name: String, actor_name: String) -> Node:
+func say(item, params):
+	if params.size() < 1:
+		print("One parameter needed for say")
+		return empty_action
+			
+	# TODO
+	var delay_seconds = 1.0
+	var speech = params[0]
+	
+	server_event("say", [item, speech, delay_seconds])
+	
+	return { block = true, delay = delay_seconds }
+
+##############################
+
+func load_room(room_name: String) -> Node:
 	var room_resource = get_room(room_name)
 	if not room_resource:
 		print("No room '%s'" % room_name)
@@ -159,28 +192,31 @@ func load_room(room_name: String, actor_name: String) -> Node:
 	current_room = room
 	
 	server_event("load_room", [room])
-	
-	if actor_name:
-		var actor_resource = get_actor(actor_name)
-		if not actor_resource:
-			print("No actor '%s'" % actor_name)
-			return null
-		
-		if not actor_resource.actor_scene:
-			print("No actor_scene in actor '%s'" % actor_name)
-			return null
-		
-		var actor = actor_resource.actor_scene.instance()
-		
-		if not actor:
-			push_error("Couldn't load actor '%s'"  % actor_name)
-			return null
-		
-		current_player = actor
-		
-		server_event("load_actor", [actor])
-	
+
 	return room
+
+func load_actor(actor_name: String) -> Node:
+	var actor_resource = get_actor(actor_name)
+	if not actor_resource:
+		print("No actor '%s'" % actor_name)
+		return null
+	
+	if not actor_resource.actor_scene:
+		print("No actor_scene in actor '%s'" % actor_name)
+		return null
+	
+	var actor = actor_resource.actor_scene.instance()
+	
+	if not actor:
+		push_error("Couldn't load actor '%s'"  % actor_name)
+		return null
+	
+	# TODO
+	current_player = actor
+	
+	server_event("load_actor", [actor])
+	
+	return actor
 
 func walk_to(actor, target_position):
 	var nav : Navigation2D = current_room.get_navigation()
@@ -224,6 +260,18 @@ func left_click(target_position: Vector2):
 	
 	walk_to(current_player, target_position)
 
+#### Finding items
+
+func get_item_named(item_name: String) -> Node:
+	# TODO make it efficient
+	var items = grog.tree.get_nodes_in_group("item")
+	
+	for i in items:
+		if i.global_id == item_name:
+			return i
+	
+	return null
+
 #### Finding resources
 
 func get_room(room_name):
@@ -243,3 +291,6 @@ func get_resource_in(list, elem_name):
 			return elem
 	return null
 
+#### Misc
+func get_default_color():
+	return Color.gray
