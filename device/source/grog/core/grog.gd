@@ -3,6 +3,8 @@ extends Node
 # TODO
 var game = null
 
+enum GameState { Idle, DoingSomething }
+
 func get_compiler():
 	return GrogCompiler.new()
 

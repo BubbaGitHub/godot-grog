@@ -7,8 +7,7 @@ var globals
 
 var pending_actions : Array
 
-enum GameState { Idle, DoingSomething}
-var state = GameState.Idle
+var state = grog.GameState.Idle
 var total_time
 
 var become_idle_when = null
@@ -33,14 +32,14 @@ func process(delta):
 
 func coroutine():
 	while true:
-		state = GameState.Idle
+		state = grog.GameState.Idle
 		yield()
 		
 		while not pending_actions:
 			yield()
 		
 		# there are pending actions
-		state = GameState.DoingSomething
+		state = grog.GameState.DoingSomething
 		
 		while true:
 			var next_action = pending_actions.pop_front()
@@ -60,28 +59,6 @@ func coroutine():
 				server_event("ready")
 				break
 		
-		# it's ready again
-#	if state == GameState.DoingSomething:
-#		var current_time = get_current_time()
-#		if become_idle_when <= current_time:
-#
-	
-	
-	
-#	if state == GameState.Idle and pending_actions:
-#		var next = pending_actions.pop_front()
-#
-#		var is_blocking = run_instruction(next)
-#
-#	elif state == GameState.DoingSomething:
-#		if become_idle_when != null:
-#			var current_time = get_current_time()
-#			if become_idle_when <= current_time:
-#				state = GameState.Idle
-#				become_idle_when = null
-		
-
-
 func run_instruction(inst: Dictionary) -> bool:
 	if inst.subject:
 		print("Unknown subject '%s'" % inst.subject)
@@ -142,7 +119,7 @@ func run_instruction(inst: Dictionary) -> bool:
 	return false
 
 func wait(delay_seconds):
-	state = GameState.DoingSomething
+	state = grog.GameState.DoingSomething
 	
 	# TODO use Timer's instead of polling
 	var current = get_current_time()

@@ -12,6 +12,7 @@ var _controls_place: Control
 
 
 var _current_room: Node2D
+var _state = grog.GameState.DoingSomething
 
 func _ready():
 	_room_place = get_node(room_place_path)
@@ -44,13 +45,15 @@ func load_actor(actor):
 	
 	actor_place.add_child(actor) 
 
-func start_waiting(seconds):
-	# start waiting 'seconds' seconds
+func start_waiting(_seconds):
+	# start waiting '_seconds' seconds
+	_state = grog.GameState.DoingSomething
 	
 	_hide_controls()
 
 func say(speech, _seconds):
 	# start waiting '_seconds' seconds
+	_state = grog.GameState.DoingSomething
 	
 	_hide_controls()
 	_text_place.clear()
@@ -62,6 +65,7 @@ func say(speech, _seconds):
 	
 func ready():
 	# end waiting
+	_state = grog.GameState.Idle
 	
 	_show_controls()
 
