@@ -4,12 +4,8 @@ export (NodePath) var room_place_path
 export (NodePath) var text_place_path
 export (NodePath) var controls_place_path
 
-export (bool) var update_layout = false
-
-# State
-var _server
-var _current_room: Node2D
-var _state = grog.GameState.DoingSomething
+# Server
+var server
 
 # Input
 enum InputState { Nothing, DoingLeftClick }
@@ -26,12 +22,8 @@ func _ready():
 	_text_place = get_node(text_place_path)
 	_controls_place = get_node(controls_place_path)
 	
-	var ret = get_tree().get_root().connect("size_changed", self, "on_viewport_resized")
-	if ret:
-		push_error("Couldn't connect 'size_changed' in root")
-
 func _input(event):
-	if _state != grog.GameState.Idle:
+	if not server or not server.is_ready():
 		return
 	
 	if event is InputEventMouseButton: 
@@ -56,33 +48,30 @@ func on_server_event(event_name, args):
 		push_warning("Unknown event '%s'" % event_name)
 
 func start_game(p_server):
-	_server = p_server
+	server = p_server
 
 func load_room(room):
+	if not _room_place:
+		return
 	make_empty(_room_place)
-	
-	_current_room = room
 	
 	_room_place.add_child(room) # room.ready is called here
 	
-	update_room_layout()
-	
 func load_actor(actor):
-	var actor_place = _current_room.get_player_place()
+	var actor_place = server.current_room.get_player_place()
 	
 	make_empty(actor_place)
 	
-	actor_place.add_child(actor) 
+	server.current_room.add_child(actor)
+	actor.transform = actor_place.transform
 
 func start_waiting(_seconds):
 	# start waiting '_seconds' seconds
-	_state = grog.GameState.DoingSomething
 	
 	_hide_controls()
 
 func say(speech, _seconds):
 	# start waiting '_seconds' seconds
-	_state = grog.GameState.DoingSomething
 	
 	_hide_controls()
 	_text_place.clear()
@@ -94,15 +83,15 @@ func say(speech, _seconds):
 	
 func ready():
 	# end waiting
-	_state = grog.GameState.Idle
 	
 	_show_controls()
-
+	_text_place.clear()
+	
+	
 #	@PRIVATE
 
 func left_click(at_position):
-	print("Click %s" % at_position)
-	
+	server.left_click(at_position)
 	
 
 func _show_controls():
@@ -112,20 +101,6 @@ func _show_controls():
 func _hide_controls():
 	if _controls_place:
 		_controls_place.hide()
-
-func update_room_layout():
-	var scale = _room_place.rect_size.y / _current_room.height
-	
-	_current_room.scale = Vector2(scale, scale)
-	
-	var room_pos = -_current_room.width * scale / 2
-	_current_room.position.x = room_pos
-	
-func on_viewport_resized():
-	if not update_layout:
-		return
-	
-	update_room_layout()
 
 ##### Misc
 

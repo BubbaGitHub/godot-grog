@@ -8,8 +8,7 @@ code_or_filename = "# example grog file
 
 :start
 
-.load_room \"room1\"      # loads the room 'room1' with no player
-
+.load_room \"room2\"
 .wait 1 seconds
 
 .say \"A long long time ago...\"
@@ -17,7 +16,7 @@ code_or_filename = "# example grog file
 #bust.say \"What happened?\"
 #.wait 1 seconds
 
-.load_room \"room2\" player=guybrush
+.load_room \"room1\" player=guybrush
 
 .wait 1 seconds
 

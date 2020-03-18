@@ -44,6 +44,5 @@ __meta__ = {
 
 [node name="display" parent="." instance=ExtResource( 4 )]
 visible = false
-room_place_path = NodePath("../../room_tester/display/room_area/room_container/room_anchor")
 [connection signal="pressed" from="ui/test_room_button" to="." method="_on_test_room_button_pressed"]
 [connection signal="pressed" from="ui/play_game_button" to="." method="_on_play_game_button_pressed"]

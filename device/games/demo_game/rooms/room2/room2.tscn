@@ -10,25 +10,29 @@ vertices = PoolVector2Array( 436.868, 546.816, 495.184, 579.457, 391.092, 579.32
 polygons = [ PoolIntArray( 0, 1, 2, 3 ), PoolIntArray( 2, 4, 5, 3 ), PoolIntArray( 6, 7, 8, 4 ), PoolIntArray( 5, 4, 8, 9 ), PoolIntArray( 9, 8, 10, 11 ), PoolIntArray( 11, 10, 0, 3 ) ]
 outlines = [ PoolVector2Array( -276.7, 547.05, -541.651, 767.385, 704, 768, 617.982, 667.559, 475.346, 666.896, 391.092, 579.324, 495.184, 579.457, 436.868, 546.816 ), PoolVector2Array( -134.578, 617.09, 251.455, 617.09, 221.168, 567.81, -116.127, 567.29 ) ]
 
-[node name="room1" type="Node2D"]
+[node name="room2" type="Node2D"]
 script = ExtResource( 4 )
 width = 1280
 height = 800
-player_place_path = NodePath("player_position")
+player_place_path = NodePath("../room2/player_position")
+navigation_path = NodePath("../room2/Navigation2D")
 
-[node name="background" type="Sprite" parent="."]
+[node name="background" type="Node2D" parent="."]
+position = Vector2( -640, 0 )
+
+[node name="background" type="Sprite" parent="background"]
 modulate = Color( 0.160784, 0.172549, 0.827451, 1 )
 texture = ExtResource( 1 )
 centered = false
 
-[node name="desk" type="Sprite" parent="."]
+[node name="desk" type="Sprite" parent="background"]
 modulate = Color( 0.996078, 0.0196078, 0.913725, 0.321569 )
 position = Vector2( 524, 380 )
 z_index = 570
 texture = ExtResource( 2 )
 centered = false
 
-[node name="table" type="Sprite" parent="."]
+[node name="table" type="Sprite" parent="background"]
 position = Vector2( 1047, 447 )
 z_index = 581
 texture = ExtResource( 3 )
@@ -37,8 +41,7 @@ centered = false
 [node name="Navigation2D" type="Navigation2D" parent="."]
 
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
-position = Vector2( 640, 0 )
 navpoly = SubResource( 1 )
 
 [node name="player_position" type="Position2D" parent="."]
-position = Vector2( 402.149, 708.587 )
+position = Vector2( -253.387, 728.114 )

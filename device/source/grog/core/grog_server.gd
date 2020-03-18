@@ -3,23 +3,25 @@
 signal grog_server_event
 
 var data
-var globals
 
-var pending_actions : Array
+# State
 
-var state = grog.GameState.Idle
-var total_time
-
-var become_idle_when = null
-
-var routine = null
+var globals = {}
 
 var started = false
+var state = grog.GameState.Idle
+var total_time = 0.0
+var current_room = null
+var current_player = null
+
+# Private
+
+var pending_actions = []
+var become_idle_when = null
+var routine = null
 
 func init_game(game_data: Resource):
 	data = game_data
-	globals = {}
-	pending_actions = []
 
 func start_default():
 	start_game()
@@ -57,17 +59,17 @@ func process(delta):
 	if routine:
 		routine = routine.resume()
 
-
 func coroutine():
+	state = grog.GameState.Idle
+	
 	while true:
-		state = grog.GameState.Idle
 		yield()
 		
 		while not pending_actions:
 			yield()
 		
 		# there are pending actions
-		state = grog.GameState.DoingSomething
+		set_busy()
 		
 		while true:
 			var next_action = pending_actions.pop_front()
@@ -84,9 +86,52 @@ func coroutine():
 				# End of blocking action
 				
 			if not pending_actions:
-				server_event("ready")
+				set_ready()
 				break
+
+func set_ready():
+	state = grog.GameState.Idle
+	server_event("ready")
+
+func set_busy():
+	state = grog.GameState.DoingSomething
+	
+func is_ready():
+	return started and state == grog.GameState.Idle
+
+##############################
+
+func run_script_named(script_name: String, routine_name: String):
+	var script_resource = get_script_resource(script_name)
+	
+	if not script_resource:
+		print("No script '%s'" % script_name)
+		return
+	
+	run_script(script_resource, routine_name)
+
+func run_script(script_resource: Resource, routine_name: String):
+	var compiled_script = grog.compile(script_resource)
+	if not compiled_script.is_valid:
+		print("Script '%s' is invalid")
 		
+		compiled_script.print_errors()
+		return
+	
+	run_compiled(compiled_script, routine_name)
+
+func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
+	if compiled_script.has_routine(routine_name):
+		var instructions = compiled_script.get_routine(routine_name)
+
+		push_actions(instructions)
+	else:
+		print("Routine '%s' not found" % routine_name)
+
+func push_actions(action_list):
+	for a in action_list:
+		pending_actions.push_back(a)
+
 func run_instruction(inst: Dictionary) -> bool:
 	if inst.subject:
 		print("Unknown subject '%s'" % inst.subject)
@@ -146,43 +191,13 @@ func run_instruction(inst: Dictionary) -> bool:
 			return false
 	return false
 
+##############################
+
 func wait(delay_seconds):
 	state = grog.GameState.DoingSomething
 	
-	# TODO use Timer's instead of polling
 	var current = get_current_time()
 	become_idle_when = within_seconds(current, delay_seconds)
-
-func run_script_named(script_name: String, routine_name: String):
-	var script_resource = get_script_resource(script_name)
-	
-	if not script_resource:
-		print("No script '%s'" % script_name)
-		return
-	
-	run_script(script_resource, routine_name)
-
-func run_script(script_resource: Resource, routine_name: String):
-	var compiled_script = grog.compile(script_resource)
-	if not compiled_script.is_valid:
-		print("Script '%s' is invalid")
-		
-		compiled_script.print_errors()
-		return
-	
-	run_compiled(compiled_script, routine_name)
-
-func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
-	if compiled_script.has_routine(routine_name):
-		var instructions = compiled_script.get_routine(routine_name)
-
-		push_actions(instructions)
-	else:
-		print("Routine '%s' not found" % routine_name)
-
-func push_actions(action_list):
-	for a in action_list:
-		pending_actions.push_back(a)
 
 func load_room(room_name: String, actor_name: String) -> Node:
 	var room_resource = get_room(room_name)
@@ -200,6 +215,8 @@ func load_room(room_name: String, actor_name: String) -> Node:
 		push_error("Couldn't load room '%s'"  % room_name)
 		return null
 	
+	current_room = room
+	
 	server_event("load_room", [room])
 	
 	if actor_name:
@@ -214,16 +231,43 @@ func load_room(room_name: String, actor_name: String) -> Node:
 		
 		var actor = actor_resource.actor_scene.instance()
 		
-		if not room:
+		if not actor:
 			push_error("Couldn't load actor '%s'"  % actor_name)
 			return null
+		
+		current_player = actor
 		
 		server_event("load_actor", [actor])
 	
 	return room
 
+func walk_to(actor, target_position):
+	var nav : Navigation2D = current_room.get_navigation()
+	
+	if not nav:
+		return
+	
+	var relative_target_position = target_position - nav.global_position
+	var relative_final_target = nav.get_closest_point(relative_target_position)
+	
+	actor.position = relative_final_target
+
+##############################
+
 func server_event(event_name: String, args: Array = []):
 	emit_signal("grog_server_event", event_name, args)
+
+#### Client calls
+
+func left_click(target_position: Vector2):
+	if not is_ready():
+		print("Rejecting click")
+		return
+	
+	if not current_player:
+		return
+	
+	walk_to(current_player, target_position)
 
 #### Finding resources
 

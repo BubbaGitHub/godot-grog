@@ -20,10 +20,9 @@ script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-room_place_path = NodePath("room_area/room_container/room_anchor")
+room_place_path = NodePath("room_area/room_anchor")
 text_place_path = NodePath("text")
 controls_place_path = NodePath("command_area/controls")
-update_layout = true
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchor_right = 1.0
@@ -40,34 +39,30 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="room_container" type="Control" parent="room_area"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="room_anchor" type="Control" parent="room_area/room_container"]
+[node name="room_anchor" type="Control" parent="room_area"]
 anchor_left = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+margin_right = 40.0
+margin_bottom = 40.0
 
 [node name="command_area" type="Control" parent="."]
 anchor_top = 0.75
 anchor_right = 1.0
 anchor_bottom = 1.0
 
+[node name="ColorRect" type="ColorRect" parent="command_area"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.388235, 0.329412, 0.329412, 0.411765 )
+
 [node name="controls" type="Control" parent="command_area"]
-visible = false
+anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 20.0
-margin_right = -20.0
-margin_bottom = -20.0
+margin_left = -600.0
+margin_top = 31.0
+margin_right = -121.0
+margin_bottom = -39.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -83,57 +78,60 @@ __meta__ = {
 }
 
 [node name="Control" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_right = 211.0
-margin_bottom = 48.0
+margin_right = 157.0
+margin_bottom = 64.0
 
 [node name="Control2" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 215.0
-margin_right = 426.0
-margin_bottom = 48.0
+margin_left = 161.0
+margin_right = 318.0
+margin_bottom = 64.0
 
 [node name="Control3" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 430.0
-margin_right = 641.0
-margin_bottom = 48.0
+margin_left = 322.0
+margin_right = 479.0
+margin_bottom = 64.0
 
 [node name="Control4" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_top = 52.0
-margin_right = 211.0
-margin_bottom = 100.0
+margin_top = 68.0
+margin_right = 157.0
+margin_bottom = 132.0
 
 [node name="Control5" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 215.0
-margin_top = 52.0
-margin_right = 426.0
-margin_bottom = 100.0
+margin_left = 161.0
+margin_top = 68.0
+margin_right = 318.0
+margin_bottom = 132.0
 
 [node name="Control6" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 430.0
-margin_top = 52.0
-margin_right = 641.0
-margin_bottom = 100.0
+margin_left = 322.0
+margin_top = 68.0
+margin_right = 479.0
+margin_bottom = 132.0
 
 [node name="Control7" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_top = 104.0
-margin_right = 211.0
-margin_bottom = 152.0
+margin_top = 136.0
+margin_right = 157.0
+margin_bottom = 200.0
 
 [node name="Control8" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 215.0
-margin_top = 104.0
-margin_right = 426.0
-margin_bottom = 152.0
+margin_left = 161.0
+margin_top = 136.0
+margin_right = 318.0
+margin_bottom = 200.0
 
 [node name="Control9" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 430.0
-margin_top = 104.0
-margin_right = 641.0
-margin_bottom = 152.0
+margin_left = 322.0
+margin_top = 136.0
+margin_right = 479.0
+margin_bottom = 200.0
 
 [node name="text" type="RichTextLabel" parent="."]
 anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = 18.0
+anchor_bottom = 0.75
+margin_left = 50.0
+margin_top = 50.0
+margin_right = -50.0
+margin_bottom = -50.0
 theme = SubResource( 2 )
 custom_fonts/normal_font = SubResource( 3 )
 custom_colors/default_color = Color( 1, 1, 1, 1 )

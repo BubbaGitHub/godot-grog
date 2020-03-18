@@ -280,7 +280,7 @@ tracks/0/keys = {
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )
-frame = 6
+frame = 1
 offset = Vector2( 0, -120 )
 
 [node name="animation" type="AnimationPlayer" parent="."]

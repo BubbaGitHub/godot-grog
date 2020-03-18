@@ -15,19 +15,24 @@ script = ExtResource( 4 )
 width = 1280
 height = 800
 player_place_path = NodePath("player_position")
+navigation_path = NodePath("Navigation2D")
 
-[node name="background" type="Sprite" parent="."]
+[node name="background" type="Node2D" parent="."]
+position = Vector2( -960, 0 )
+
+[node name="background" type="Sprite" parent="background"]
+position = Vector2( 320, 0 )
 texture = ExtResource( 1 )
 centered = false
 
-[node name="desk" type="Sprite" parent="."]
-position = Vector2( 524, 380 )
+[node name="desk" type="Sprite" parent="background"]
+position = Vector2( 844, 380 )
 z_index = 570
 texture = ExtResource( 2 )
 centered = false
 
-[node name="table" type="Sprite" parent="."]
-position = Vector2( 1047, 447 )
+[node name="table" type="Sprite" parent="background"]
+position = Vector2( 1367, 447 )
 z_index = 581
 texture = ExtResource( 3 )
 centered = false
@@ -35,8 +40,7 @@ centered = false
 [node name="Navigation2D" type="Navigation2D" parent="."]
 
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
-position = Vector2( 640, 0 )
 navpoly = SubResource( 1 )
 
 [node name="player_position" type="Position2D" parent="."]
-position = Vector2( 959.903, 618.802 )
+position = Vector2( 305.94, 703.394 )
