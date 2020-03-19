@@ -5,10 +5,12 @@ signal game_server_event
 
 var data
 
+var root_node : Node
+
 # State
 var globals = {}
-var current_room = null
-var current_player = null
+var current_room : Node = null
+var current_player : Node = null
 
 var event_queue : EventQueue = EventQueue.new()
 
@@ -29,7 +31,9 @@ func init_game(game_data: Resource, p_game_start_mode = StartMode.Default, p_gam
 	_game_start_mode = p_game_start_mode
 	_game_start_param = p_game_start_param
 
-func start_game():
+func start_game(p_root_node: Node):
+	root_node = p_root_node
+	
 	server_event("game_started")
 	event_queue.start(self)
 	
@@ -189,9 +193,22 @@ func load_room(room_name: String) -> Node:
 		push_error("Couldn't load room '%s'"  % room_name)
 		return null
 	
+	if current_player:
+		current_room.remove_child(current_player)
+		current_player.queue_free()
+		current_player = null
+	
+	if current_room:
+		root_node.remove_child(current_room)
+		current_room.queue_free()
+	
+	# TODO also free another actors and items
+	
 	current_room = room
 	
-	server_event("room_loaded", [room])
+	root_node.add_child(room) # room's _ready is called here
+	
+	server_event("room_loaded", [room]) # TODO parameter is not necessary
 
 	return room
 
@@ -212,7 +229,11 @@ func load_actor(actor_name: String) -> Node:
 		return null
 	
 	# TODO
-	current_player = actor
+	if not current_player:
+		current_player = actor
+	
+	current_room.add_child(actor)
+	actor.transform = current_room.get_player_default_position()
 	
 	server_event("actor_loaded", [actor])
 	

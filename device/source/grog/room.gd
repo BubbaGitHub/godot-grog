@@ -12,8 +12,10 @@ export (NodePath) var debug_node_path
 func start_room():
 	pass
 	
-func get_player_place():
-	return get_node_if_present(player_place_path)
+func get_player_default_position():
+	var player_spot = get_node_if_present(player_place_path)
+	if player_spot:
+		return player_spot.transform
 
 func get_navigation():
 	return get_node_if_present(navigation_path)

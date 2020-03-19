@@ -34,7 +34,8 @@ func _ready():
 
 func init(game_server):
 	server = game_server
-	server.start_game()
+	if _room_place:
+		server.start_game(_room_place)
 	
 func _input(event):
 	if not server or not server.is_ready():
@@ -68,21 +69,11 @@ func on_server_event(event_name, args):
 func on_game_started():
 	pass
 
-func on_room_loaded(room):
-	if not _room_place:
-		return
+func on_room_loaded(_room):
+	pass
 	
-	# TODO do this in server
-	make_empty(_room_place)
-	_room_place.add_child(room) # room.ready is called here
-	
-func on_actor_loaded(actor):
-	var actor_place = server.current_room.get_player_place()
-	
-	# TODO do this in server
-	make_empty(actor_place)
-	server.current_room.add_child(actor)
-	actor.transform = actor_place.transform
+func on_actor_loaded(_actor):
+	pass
 
 func on_wait_started(_seconds):
 	# start waiting '_seconds' seconds
@@ -91,6 +82,7 @@ func on_wait_started(_seconds):
 
 func on_say(subject, speech, _seconds):
 	# start waiting '_seconds' seconds
+	
 	if subject:
 		var position = subject.get_speech_position() + _room_place.rect_position
 		_say_text(speech, subject.color, position)
