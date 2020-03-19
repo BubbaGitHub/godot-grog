@@ -5,14 +5,28 @@ export (Color) var color
 
 export (NodePath) var speech_position_path
 
+export (float) var walk_speed = 300 # pixels per second
+
 # TODO build always?
 var event_queue = EventQueue.new()
+
+#var _is_walking = false
+var _walking_routine = null
+#var _path : Array
 
 ##############################
 
 func _ready():
 	add_to_group("item")
 	event_queue.start(self)
+
+
+func _process(delta):
+	if _walking_routine:
+		_walking_routine = _walking_routine.resume(delta)
+
+func is_ready():
+	return event_queue.started and event_queue.is_ready()
 
 ##############################
 
@@ -31,21 +45,59 @@ func walk(path):
 
 ##############################
 
-func do_action(inst: Dictionary) -> Dictionary:
+func do_action(action: Dictionary) -> Dictionary:
 	var ret = { block = false }
 	
-	if inst.command == "walk":
-		print("Walk to %s" % inst.path)
+	if action.command == "walk":
+		assert(not _walking_routine)
+		assert(action.has("path") and action.path.size() >= 2)
 		
+		_walking_routine = walking_routine(action.path)
+		
+		# blocks until event_queue.is_blocked is manually set to false
 		ret.block = true
-		ret.delay = 1.0
 	
 	return ret
 
 func set_ready():
-	print("I'm ready'")
+	pass
 
 ##############################
+
+func walking_routine(path: Array):
+	while path.size() >= 2:
+		var time = 0.0
+	
+		var origin: Vector2 = path[0]
+		var destiny: Vector2 = path[1]
+		
+		var displacement = destiny - origin
+		var distance2 = displacement.length_squared()
+		var direction = displacement.normalized()
+		
+		var finish_step = false
+		
+		while not finish_step:
+			time += yield()
+			
+			var step_distance = walk_speed * time
+			
+			var target_point = origin + step_distance * direction
+			if pow(step_distance, 2) >= distance2:
+				teleport(destiny)
+				finish_step = true
+			else:
+				teleport(target_point)
+			
+		path.pop_front()
+	
+	event_queue.is_blocked = false
+
+##############################
+
+func teleport(target_pos):
+	position = target_pos
+	z_index = int(target_pos.y)
 
 func get_speech_position():
 	if speech_position_path and has_node(speech_position_path):

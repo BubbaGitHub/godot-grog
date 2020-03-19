@@ -22,6 +22,7 @@ position = Vector2( -640, 0 )
 
 [node name="background" type="Sprite" parent="background"]
 modulate = Color( 0.44, 0.449333, 1, 1 )
+z_as_relative = false
 texture = ExtResource( 1 )
 centered = false
 
@@ -29,12 +30,14 @@ centered = false
 modulate = Color( 0.996078, 0.0196078, 0.913725, 0.321569 )
 position = Vector2( 524, 380 )
 z_index = 570
+z_as_relative = false
 texture = ExtResource( 2 )
 centered = false
 
 [node name="table" type="Sprite" parent="background"]
 position = Vector2( 1047, 447 )
 z_index = 581
+z_as_relative = false
 texture = ExtResource( 3 )
 centered = false
 
@@ -44,4 +47,4 @@ centered = false
 navpoly = SubResource( 1 )
 
 [node name="player_position" type="Position2D" parent="."]
-position = Vector2( -253.387, 728.114 )
+position = Vector2( 198.515, 719.745 )

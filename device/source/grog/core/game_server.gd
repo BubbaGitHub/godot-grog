@@ -228,12 +228,13 @@ func load_actor(actor_name: String) -> Node:
 		push_error("Couldn't load actor '%s'"  % actor_name)
 		return null
 	
+	current_room.add_child(actor)
+	
 	# TODO
 	if not current_player:
 		current_player = actor
 	
-	current_room.add_child(actor)
-	actor.transform = current_room.get_player_default_position()
+	actor.teleport(current_room.get_player_default_position())
 	
 	server_event("actor_loaded", [actor])
 	
@@ -251,10 +252,6 @@ func walk_to(actor, target_position):
 	var current_position = actor.position
 	
 	var path = nav.get_simple_path(current_position, relative_final_target)
-	
-	var debug_node = current_room.get_debug_node()
-	if debug_node:
-		debug_node.draw_points(path)
 	
 	actor.walk(path)
 
@@ -276,7 +273,7 @@ func left_click(target_position: Vector2):
 		print("Rejecting click")
 		return
 	
-	if not current_player:
+	if not current_player or not current_player.is_ready():
 		return
 	
 	walk_to(current_player, target_position)

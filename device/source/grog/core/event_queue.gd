@@ -13,8 +13,11 @@ var state = State.Idle
 var total_time = 0.0
 
 var _pending_actions = []
-var _become_idle_when = null
 var _routine = null
+
+var is_blocked = false
+var _timer_on = false
+var _become_idle_when = null
 
 func start(p_target):
 	target = p_target
@@ -47,20 +50,30 @@ func coroutine():
 		while true:
 			var next_action = _pending_actions.pop_front()
 			
-			var event_result = target.do_action(next_action)
+			var action_result = target.do_action(next_action)
 			
-			if event_result.block:
-				var current = get_current_time()
-				_become_idle_when = within_seconds(current, event_result.delay)
+			if action_result.block:
+				is_blocked = true
+				
+				if action_result.has("delay"):
+					var current = get_current_time()
+					_timer_on = true
+					_become_idle_when = within_seconds(current, action_result.delay)
+				
+				# else it is blocked until is_blocked is set to false manually
 				
 				# Start blocking action
-				while true:
+				while is_blocked:
 					yield()
-					var current_time = get_current_time()
-					if _become_idle_when <= current_time:
-						break
+					
+					if _timer_on:
+						var current_time = get_current_time()
+						if _become_idle_when <= current_time:
+							is_blocked = false
 				# End of blocking action
 				
+				_timer_on = false
+			
 			if not _pending_actions:
 				set_ready()
 				break

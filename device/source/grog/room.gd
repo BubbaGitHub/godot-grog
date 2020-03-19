@@ -15,7 +15,7 @@ func start_room():
 func get_player_default_position():
 	var player_spot = get_node_if_present(player_place_path)
 	if player_spot:
-		return player_spot.transform
+		return player_spot.position
 
 func get_navigation():
 	return get_node_if_present(navigation_path)
