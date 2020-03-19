@@ -30,6 +30,11 @@ _global_script_classes=[ {
 "path": "res://source/grog/core/game_resource.gd"
 }, {
 "base": "Reference",
+"class": "GameServer",
+"language": "GDScript",
+"path": "res://source/grog/core/game_server.gd"
+}, {
+"base": "Reference",
 "class": "GrogCompiler",
 "language": "GDScript",
 "path": "res://source/grog/core/grog_compiler.gd"
@@ -49,6 +54,7 @@ _global_script_class_icons={
 "CompiledGrogScript": "",
 "EventQueue": "",
 "GameResource": "",
+"GameServer": "",
 "GrogCompiler": "",
 "GrogScript": "",
 "RoomResource": ""

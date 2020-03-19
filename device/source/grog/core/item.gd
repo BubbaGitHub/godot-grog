@@ -14,9 +14,6 @@ func _ready():
 	add_to_group("item")
 	event_queue.start(self)
 
-func _process(delta):
-	event_queue.process(delta)
-
 ##############################
 
 func is_active():

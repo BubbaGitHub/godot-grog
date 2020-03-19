@@ -1,4 +1,4 @@
-extends Node
+class_name GameServer
 
 # server to client signals
 signal game_server_event
@@ -12,44 +12,47 @@ var current_player = null
 
 var event_queue : EventQueue = EventQueue.new()
 
+enum StartMode {
+	Default,
+	FromScript,
+	FromCompiledScript
+}
+
+var _game_start_mode
+var _game_start_param
+
 const empty_action = { block = false }
 
-func init_game(game_data: Resource):
+func init_game(game_data: Resource, p_game_start_mode = StartMode.Default, p_game_start_param = null):
 	data = game_data
-
-func start_default():
-	start_game()
 	
-	var scripts = data.get_all_scripts()
-	
-	if not scripts:
-		print("Game data has no scripts")
-		return
-	
-	if not scripts:
-		print("Game data has no scripts")
-		return
-	
-	if not scripts:
-		print("Game data has no scripts")
-		return
-	
-	var script = scripts[0]
-	run_script(script, "start")
-
-func start_from_compiled_script(compiled_script: CompiledGrogScript):
-	start_game()
-	run_compiled(compiled_script, "start")
+	_game_start_mode = p_game_start_mode
+	_game_start_param = p_game_start_param
 
 func start_game():
-	server_event("start_game", [self])
+	server_event("game_started")
 	event_queue.start(self)
-
-func process(delta):
-	event_queue.process(delta)
+	
+	match _game_start_mode:
+		StartMode.Default:
+			var scripts = data.get_all_scripts()
+			
+			if not scripts:
+				print("Game data has no scripts")
+				return
+			
+			if not scripts[0]:
+				print("Game data has no first script")
+				return
+			
+			var script = scripts[0]
+			run_script(script, "start")
+		
+		StartMode.FromCompiledScript:
+			run_compiled(_game_start_param, "start")
 
 func set_ready():
-	server_event("ready")
+	server_event("set_ready")
 
 ##############################
 
@@ -107,7 +110,10 @@ func do_global_action(action: Dictionary) -> Dictionary:
 			
 			var room = load_room(room_name)
 			
-			if not room:
+			if room:
+				# TODO check this (clearing player when loading new room)
+				current_player = null
+			else:
 				print("Couldn't load room '%s'" % room_name)
 		
 		"load_actor":
@@ -121,12 +127,6 @@ func do_global_action(action: Dictionary) -> Dictionary:
 			
 			if not actor:
 				print("Couldn't load actor '%s'" % actor_name)
-		
-		"show_controls":
-			server_event("show_controls")
-			
-		"hide_controls":
-			server_event("hide_controls")
 			
 		"wait":
 			if params.size() < 1:
@@ -136,7 +136,7 @@ func do_global_action(action: Dictionary) -> Dictionary:
 			var time_param = params[0]
 			var delay_seconds = float(time_param)
 			
-			server_event("start_waiting", [delay_seconds])
+			server_event("wait_started", [delay_seconds])
 			
 			return { block = true, delay = delay_seconds }
 			
@@ -191,7 +191,7 @@ func load_room(room_name: String) -> Node:
 	
 	current_room = room
 	
-	server_event("load_room", [room])
+	server_event("room_loaded", [room])
 
 	return room
 
@@ -214,7 +214,7 @@ func load_actor(actor_name: String) -> Node:
 	# TODO
 	current_player = actor
 	
-	server_event("load_actor", [actor])
+	server_event("actor_loaded", [actor])
 	
 	return actor
 

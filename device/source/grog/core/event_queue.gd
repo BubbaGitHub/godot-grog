@@ -1,15 +1,20 @@
 
 class_name EventQueue
 
+enum State {
+	Idle,
+	Busy
+}
+
 var target
 
 var started = false
-var state = grog.GameState.Idle
+var state = State.Idle
 var total_time = 0.0
 
-var pending_actions = []
-var become_idle_when = null
-var routine = null
+var _pending_actions = []
+var _become_idle_when = null
+var _routine = null
 
 func start(p_target):
 	target = p_target
@@ -17,61 +22,63 @@ func start(p_target):
 	started = true
 	total_time = 0.0
 	
-	routine = coroutine()
+	_routine = coroutine()
 	
-func process(delta):
+	var _ret = grog.connect("grog_update", self, "grog_update")
+	
+func grog_update(delta):
 	total_time += delta
 
-	if routine:
-		routine = routine.resume()
+	if _routine:
+		_routine = _routine.resume()
 
 func coroutine():
-	state = grog.GameState.Idle
+	state = State.Idle
 	
 	while true:
 		yield()
 		
-		while not pending_actions:
+		while not _pending_actions:
 			yield()
 		
 		# there are pending actions
 		set_busy()
 		
 		while true:
-			var next_action = pending_actions.pop_front()
+			var next_action = _pending_actions.pop_front()
 			
 			var event_result = target.do_action(next_action)
 			
 			if event_result.block:
 				var current = get_current_time()
-				become_idle_when = within_seconds(current, event_result.delay)
+				_become_idle_when = within_seconds(current, event_result.delay)
 				
 				# Start blocking action
 				while true:
 					yield()
 					var current_time = get_current_time()
-					if become_idle_when <= current_time:
+					if _become_idle_when <= current_time:
 						break
 				# End of blocking action
 				
-			if not pending_actions:
+			if not _pending_actions:
 				set_ready()
 				break
 
 func set_ready():
-	state = grog.GameState.Idle
+	state = State.Idle
 	target.set_ready()
 
 func set_busy():
-	state = grog.GameState.DoingSomething
+	state = State.Busy
 	
 func is_ready():
-	return started and state == grog.GameState.Idle
+	return started and state == State.Idle
 
 #####################
 
 func push_action(action):
-	pending_actions.push_back(action)
+	_pending_actions.push_back(action)
 	
 func push_actions(action_list):
 	for action in action_list:

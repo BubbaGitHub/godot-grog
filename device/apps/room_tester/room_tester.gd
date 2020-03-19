@@ -42,20 +42,22 @@ func _on_test_room_button_pressed():
 func _on_play_game_button_pressed():
 	play_game()
 	
-	_grog_game.start_default()
-	
 func test_room(_room_resource):
-	play_game()
-
 	var compiled_script = CompiledGrogScript.new()
 	compiled_script.add_routine("start", [ { subject = "", command = "load_room", params = [_room_resource.get_name()] } ])
 	
-	_grog_game.start_from_compiled_script(compiled_script)
+	play_game(GameServer.StartMode.FromCompiledScript, compiled_script)
 
-func play_game():
+
+func play_game(game_mode = GameServer.StartMode.Default, param = null):
 	_ui.hide()
 	_display.show()
 	
-	_grog_game = grog.new_game_server(game_to_load)
+	_grog_game = GameServer.new()  
+	
+	_grog_game.init_game(game_to_load, game_mode, param)
+	
 	_grog_game.connect("game_server_event", _display, "on_server_event")
+	
+	_display.init(_grog_game)
 	

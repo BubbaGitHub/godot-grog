@@ -1,31 +1,22 @@
 extends Node
 
-# TODO
-var game = null
+signal grog_update
 
 var tree
 
-func _enter_tree():
-	# TODO
-	tree = get_tree()
-
-enum GameState { Idle, DoingSomething }
-
-func get_compiler():
-	return GrogCompiler.new()
-
-func _process(delta):
-	if game and game.has_started():
-		game.process(delta)
 
 #	@PUBLIC
 
-func new_game_server(game_data: Resource) -> Object:
-	game = game_data.game_server_model.new()
-	
-	game.init_game(game_data)
-
-	return game
+func _enter_tree():
+	tree = get_tree()
 
 func compile(script: Resource) -> Object:
 	return get_compiler().compile(script)
+
+func get_compiler():
+	return GrogCompiler.new()
+	
+#	@GODOT
+	
+func _process(delta):
+	emit_signal("grog_update", delta)

@@ -25,5 +25,5 @@ guybrush.say \"Fine\"
 
 .wait 1 seconds
 
-.load_room \"room2\"
+#.load_room \"room2\"
 "

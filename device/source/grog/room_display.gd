@@ -31,6 +31,10 @@ func _ready():
 	_text_label_anchor = get_node(text_label_anchor_path)
 	
 	_default_text_position = _text_label_anchor.rect_position
+
+func init(game_server):
+	server = game_server
+	server.start_game()
 	
 func _input(event):
 	if not server or not server.is_ready():
@@ -47,49 +51,66 @@ func _input(event):
 				# currently only exact clicks work
 				
 				if event.position == input_position:
-					left_click(input_position)
+					_left_click(input_position)
 				
 				input_state = InputState.Nothing
 
 func on_server_event(event_name, args):
-	if self.has_method(event_name):
-		self.callv(event_name, args)
+	var handler_name = "on_" + event_name
+	
+	if self.has_method(handler_name):
+		self.callv(handler_name, args)
 	else:
-		push_warning("Unknown event '%s'" % event_name)
+		push_warning("Display has no method '%s'" % handler_name)
 
-func start_game(p_server):
-	server = p_server
+#	@SERVER EVENTS
 
-func load_room(room):
+func on_game_started():
+	pass
+
+func on_room_loaded(room):
 	if not _room_place:
 		return
-	make_empty(_room_place)
 	
+	# TODO do this in server
+	make_empty(_room_place)
 	_room_place.add_child(room) # room.ready is called here
 	
-func load_actor(actor):
+func on_actor_loaded(actor):
 	var actor_place = server.current_room.get_player_place()
 	
+	# TODO do this in server
 	make_empty(actor_place)
-	
 	server.current_room.add_child(actor)
 	actor.transform = actor_place.transform
 
-func start_waiting(_seconds):
+func on_wait_started(_seconds):
 	# start waiting '_seconds' seconds
 	
 	_hide_controls()
 
-func say(subject, speech, _seconds):
+func on_say(subject, speech, _seconds):
 	# start waiting '_seconds' seconds
 	if subject:
 		var position = subject.get_speech_position() + _room_place.rect_position
-		say_text(speech, subject.color, position)
+		_say_text(speech, subject.color, position)
 	else:
-		say_text(speech, server.get_default_color(), _default_text_position)
+		_say_text(speech, server.get_default_color(), _default_text_position)
 	
 
-func say_text(speech, color, text_position):
+func on_set_ready():
+	# end waiting
+	
+	_show_controls()
+	_text_label.clear()
+	
+	
+#	@PRIVATE
+
+func _left_click(at_position):
+	server.left_click(at_position)
+	
+func _say_text(speech, color, text_position):
 	_hide_controls()
 	
 	_text_label_anchor.rect_position = text_position
@@ -101,19 +122,6 @@ func say_text(speech, color, text_position):
 	_text_label.pop()
 	_text_label.pop()
 	
-func ready():
-	# end waiting
-	
-	_show_controls()
-	_text_label.clear()
-	
-	
-#	@PRIVATE
-
-func left_click(at_position):
-	server.left_click(at_position)
-	
-
 func _show_controls():
 	if _controls_place:
 		_controls_place.show()
