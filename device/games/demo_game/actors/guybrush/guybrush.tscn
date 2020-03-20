@@ -1,4 +1,4 @@
-[gd_scene load_steps=82 format=2]
+[gd_scene load_steps=80 format=2]
 
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/00.png" type="Texture" id=1]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/01.png" type="Texture" id=2]
@@ -91,21 +91,6 @@ tracks/0/keys = {
 "values": [ 1 ]
 }
 
-[sub_resource type="Animation" id=3]
-resource_name = "idle_left"
-tracks/0/type = "value"
-tracks/0/path = NodePath("Sprite:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ 0 ]
-}
-
 [sub_resource type="Animation" id=4]
 resource_name = "idle_leftfront"
 tracks/0/type = "value"
@@ -134,21 +119,6 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1 ),
 "update": 1,
 "values": [ 3 ]
-}
-
-[sub_resource type="Animation" id=6]
-resource_name = "idle_right"
-tracks/0/type = "value"
-tracks/0/path = NodePath("Sprite:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ 2 ]
 }
 
 [sub_resource type="Animation" id=7]
@@ -293,10 +263,8 @@ offset = Vector2( 0, -120 )
 
 [node name="animation" type="AnimationPlayer" parent="."]
 anims/idle_front = SubResource( 2 )
-anims/idle_left = SubResource( 3 )
 anims/idle_leftfront = SubResource( 4 )
 anims/idle_leftup = SubResource( 5 )
-anims/idle_right = SubResource( 6 )
 anims/idle_rightfront = SubResource( 7 )
 anims/idle_rightup = SubResource( 8 )
 anims/idle_up = SubResource( 9 )
@@ -312,21 +280,37 @@ position = Vector2( 0.663422, -246.129 )
 [node name="ndirections" type="Node" parent="."]
 script = ExtResource( 67 )
 config = [ {
-"idle": "idle_right",
-"value": 45.0,
+"idle": "idle_rightfront",
+"value": 22.5,
 "walk": "walk_left.flip_h"
 }, {
+"idle": "idle_rightfront",
+"value": 67.5,
+"walk": "walk_leftfront.flip_h"
+}, {
 "idle": "idle_front",
-"value": 135.0,
+"value": 112.5,
 "walk": "walk_front"
 }, {
-"idle": "idle_left",
-"value": 225.0,
+"idle": "idle_leftfront",
+"value": 157.5,
+"walk": "walk_leftfront"
+}, {
+"idle": "idle_leftfront",
+"value": 202.5,
 "walk": "walk_left"
 }, {
+"idle": "idle_leftup",
+"value": 247.5,
+"walk": "walk_leftup"
+}, {
 "idle": "idle_up",
-"value": 315.0,
+"value": 292.5,
 "walk": "walk_up"
+}, {
+"idle": "idle_rightup",
+"value": 337.5,
+"walk": "walk_leftup.flip_h"
 } ]
 animation_path = NodePath("../animation")
 sprite_path = NodePath("../Sprite")
