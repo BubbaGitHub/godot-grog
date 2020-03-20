@@ -159,7 +159,7 @@ anims/walk_right = SubResource( 7 )
 anims/walk_up = SubResource( 8 )
 
 [node name="speech_position" type="Position2D" parent="."]
-position = Vector2( 0.663422, -246.129 )
+position = Vector2( 0, -270 )
 
 [node name="ndirections" type="Node" parent="."]
 script = ExtResource( 67 )
