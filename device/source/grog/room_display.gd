@@ -121,12 +121,3 @@ func _show_controls():
 func _hide_controls():
 	if _controls_place:
 		_controls_place.hide()
-
-##### Misc
-
-func make_empty(node):
-	while node.get_child_count():
-		var first_child = node.get_child(0)
-		node.remove_child(first_child)
-		first_child.queue_free()
-
