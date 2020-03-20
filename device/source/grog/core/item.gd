@@ -7,12 +7,14 @@ export (NodePath) var speech_position_path
 
 export (float) var walk_speed = 300 # pixels per second
 
+signal start_walking
+signal stop_walking
+
 # TODO build always?
+# TODO currently it is not used
 var event_queue = EventQueue.new()
 
-#var _is_walking = false
 var _walking_routine = null
-#var _path : Array
 
 ##############################
 
@@ -75,6 +77,8 @@ func walking_routine(path: Array):
 		var distance2 = displacement.length_squared()
 		var direction = displacement.normalized()
 		
+		emit_signal("start_walking", direction)
+		
 		var finish_step = false
 		
 		while not finish_step:
@@ -91,13 +95,19 @@ func walking_routine(path: Array):
 			
 		path.pop_front()
 	
+	emit_signal("stop_walking")
+	
 	event_queue.is_blocked = false
 
 ##############################
 
 func teleport(target_pos):
 	position = target_pos
-	z_index = int(target_pos.y)
+	on_teleport(target_pos)
+
+# abstract method
+func on_teleport(_target_pos):
+	pass
 
 func get_speech_position():
 	if speech_position_path and has_node(speech_position_path):

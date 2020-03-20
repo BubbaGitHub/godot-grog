@@ -1,4 +1,4 @@
-[gd_scene load_steps=81 format=2]
+[gd_scene load_steps=82 format=2]
 
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/00.png" type="Texture" id=1]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/01.png" type="Texture" id=2]
@@ -65,7 +65,8 @@
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/63.png" type="Texture" id=63]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/64.png" type="Texture" id=64]
 [ext_resource path="res://games/demo_game/actors/guybrush/sprites/65.png" type="Texture" id=65]
-[ext_resource path="res://source/grog/core/item.gd" type="Script" id=66]
+[ext_resource path="res://source/grog/2d/item2d.gd" type="Script" id=66]
+[ext_resource path="res://source/grog/2d/ndirections_sprite.gd" type="Script" id=67]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -280,8 +281,9 @@ tracks/0/keys = {
 [node name="guybrush" type="Node2D"]
 script = ExtResource( 66 )
 global_id = "guybrush"
-color = Color( 0.3397, 0.79, 0.316, 1 )
+color = Color( 0.341176, 0.788235, 0.317647, 1 )
 speech_position_path = NodePath("speech_position")
+walk_speed = 200.0
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )
@@ -305,3 +307,10 @@ anims/walk_up = SubResource( 14 )
 
 [node name="speech_position" type="Position2D" parent="."]
 position = Vector2( 0.663422, -246.129 )
+
+[node name="ndirections" type="Node" parent="."]
+script = ExtResource( 67 )
+animation_path = NodePath("../animation")
+sprite_path = NodePath("../Sprite")
+[connection signal="start_walking" from="." to="ndirections" method="_on_start_walking"]
+[connection signal="stop_walking" from="." to="ndirections" method="_on_stop_walking"]

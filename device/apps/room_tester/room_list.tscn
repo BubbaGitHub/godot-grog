@@ -4,6 +4,8 @@
 [ext_resource path="res://apps/room_tester/room_list.gd" type="Script" id=2]
 [ext_resource path="res://source/label.gd" type="Script" id=3]
 
+
+
 [node name="room_list" type="Control"]
 anchor_left = 0.5
 anchor_right = 1.0
