@@ -45,24 +45,13 @@ func coroutine():
 			
 			if action_result.block:
 				if action_result.has("routine"):
-					if action_result.has("delay"):
-						push_warning("Parameter 'delay' has no effect if 'routine' is present")
-					
 					var subroutine = action_result.routine
 					
 					while subroutine:
 						var delta = yield()
 						subroutine = subroutine.resume(delta)
-					
-				elif action_result.has("delay"):
-					var delay = action_result.delay
-					
-					var elapsed = 0.0
-					
-					while elapsed < delay:
-						elapsed += yield()
 				else:
-					push_error("Blocking action must have either 'routine' or 'delay parameter'")
+					print("'block' is true but no 'routine'")
 			
 			if not _pending_actions:
 				set_ready()

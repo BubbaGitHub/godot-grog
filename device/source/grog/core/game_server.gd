@@ -130,7 +130,7 @@ func wait(time_param: String, _params = []):
 	
 	server_event("wait_started", [delay_seconds])
 	
-	return { block = true, delay = delay_seconds }
+	return { block = true, routine = _wait_routine(delay_seconds) }
 
 func say(item_name: String, speech: String, _params = []):
 	var item = null
@@ -144,7 +144,7 @@ func say(item_name: String, speech: String, _params = []):
 	
 	server_event("say", [item, speech, delay_seconds])
 	
-	return { block = true, delay = delay_seconds }
+	return { block = true, routine = _wait_routine(delay_seconds) }
 
 func walk(item_name: String, params: Array):
 	if not item_name:
@@ -251,6 +251,16 @@ func _load_actor(actor_name: String, starting_position: Vector2) -> Node:
 	server_event("actor_loaded", [actor])
 	
 	return actor
+
+func _wait_routine(delay_seconds: float):
+	var elapsed = 0.0
+	
+	while elapsed < delay_seconds:
+		elapsed += yield()
+	
+	#TODO server_event("end_waiting")
+	
+	# ends waiting
 
 func _walk_to(actor, target_position: Vector2, global = false) -> Dictionary:
 	var nav : Navigation2D = current_room.get_navigation()
