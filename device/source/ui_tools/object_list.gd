@@ -20,7 +20,7 @@ var _current_selected = null
 #	@PUBLIC
 
 func get_current():
-	return _current_selected.target
+	return _current_selected.target if _current_selected else null
 
 func add_item(target: Resource) -> void:
 	if not item_model:

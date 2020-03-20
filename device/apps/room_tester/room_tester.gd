@@ -2,9 +2,11 @@ extends Node
 
 export (Resource) var game_to_load
 
-onready var _room_list = $ui/room_list
 onready var _ui = $ui
 onready var _display = $display
+
+onready var _room_list = $ui/test_rooms/room_list
+onready var _actor_list = $ui/test_rooms/actor_list
 
 var _grog_game = null
 
@@ -14,6 +16,7 @@ func _ready():
 		return
 	
 	list_rooms()
+	list_actors()
 	
 func list_rooms():
 	if not _room_list:
@@ -27,24 +30,43 @@ func list_rooms():
 	
 	_room_list.select_anyone()
 	
-func _on_test_room_button_pressed():
-	if not _room_list:
-		push_error("No _room_list")
+func list_actors():
+	if not _actor_list:
+		push_error("No _actor_list")
 		return
-		
+	
+	var all_actors = game_to_load.get_all_actors()
+	
+	for actor in all_actors:
+		_actor_list.add_item(actor)
+	
+	_actor_list.select_anyone()
+	
+
+func _on_test_room_button_pressed():
 	var current_room = _room_list.get_current()
 	
 	if not current_room:
 		return
 	
-	test_room(current_room)
+	var current_player = _actor_list.get_current()
+	
+	test_room(current_room, current_player)
 
 func _on_play_game_button_pressed():
 	play_game()
 	
-func test_room(_room_resource):
+func _on_quit_button_pressed():
+	get_tree().quit()
+	
+func test_room(_room_resource, _actor_resource):
 	var compiled_script = CompiledGrogScript.new()
-	compiled_script.add_routine("start", [ { subject = "", command = "load_room", params = [_room_resource.get_name()] } ])
+	var start_routine = [{ subject = "", command = "load_room", params = [_room_resource.get_name()] }]
+	
+	if _actor_resource:
+		start_routine.append({ subject = "", command = "load_actor", params = [_actor_resource.get_name()] })
+	
+	compiled_script.add_routine("start", start_routine)
 	
 	play_game(GameServer.StartMode.FromCompiledScript, compiled_script)
 
@@ -61,3 +83,4 @@ func play_game(game_mode = GameServer.StartMode.Default, param = null):
 	
 	_display.init(_grog_game)
 	
+

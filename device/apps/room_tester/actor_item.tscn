@@ -2,7 +2,7 @@
 
 [ext_resource path="res://source/ui_tools/object_item.gd" type="Script" id=1]
 
-[node name="room_item" type="HBoxContainer"]
+[node name="actor_item" type="HBoxContainer"]
 margin_top = 84.0
 margin_right = 440.0
 margin_bottom = 164.0
@@ -11,22 +11,22 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-label_path = NodePath("room_name/Label")
+label_path = NodePath("actor_name/Label")
 
 [node name="check" type="CheckBox" parent="."]
 margin_right = 24.0
 margin_bottom = 80.0
 
-[node name="room_name" type="Control" parent="."]
+[node name="actor_name" type="Control" parent="."]
 margin_left = 28.0
 margin_right = 232.0
 margin_bottom = 80.0
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="room_name"]
+[node name="Label" type="Label" parent="actor_name"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-text = "desk"
+text = "mark"
 valign = 1
 __meta__ = {
 "_edit_use_anchors_": false

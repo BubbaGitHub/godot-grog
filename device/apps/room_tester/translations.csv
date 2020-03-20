@@ -1,4 +1,6 @@
 id	en	es
 ROOM_TESTER_ROOMS	rooms	habitaciones
+ROOM_TESTER_ACTORS	actors	actores
 ROOM_TESTER_TEST_ROOM	test room	probar habitación
 ROOM_TESTER_PLAY_GAME	play game	iniciar juego
+ROOM_TESTER_QUIT	quit	salir

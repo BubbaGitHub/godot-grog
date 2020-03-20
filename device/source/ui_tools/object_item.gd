@@ -9,6 +9,8 @@ extends "res://source/view.gd"
 
 signal item_toggled
 
+export (NodePath) var label_path
+
 #	@PRIVATE
 
 func target_changing(_old_target, _new_target):
@@ -20,9 +22,8 @@ func set_label_text(new_text):
 	if label:
 		label.text = new_text
 
-# override me
 func get_label():
-	return null
+	return get_node(label_path)
 
 func check():
 	$check.pressed = true
