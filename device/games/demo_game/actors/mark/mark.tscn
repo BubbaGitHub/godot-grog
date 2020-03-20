@@ -43,7 +43,7 @@ tracks/0/keys = {
 "values": [ 0 ]
 }
 
-[sub_resource type="Animation" id=6]
+[sub_resource type="Animation" id=3]
 resource_name = "idle_right"
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:frame")
@@ -58,7 +58,7 @@ tracks/0/keys = {
 "values": [ 2 ]
 }
 
-[sub_resource type="Animation" id=7]
+[sub_resource type="Animation" id=4]
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:frame")
 tracks/0/interp = 1
@@ -72,7 +72,7 @@ tracks/0/keys = {
 "values": [ 1 ]
 }
 
-[sub_resource type="Animation" id=9]
+[sub_resource type="Animation" id=5]
 resource_name = "idle_up"
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:frame")
@@ -87,7 +87,7 @@ tracks/0/keys = {
 "values": [ 3 ]
 }
 
-[sub_resource type="Animation" id=10]
+[sub_resource type="Animation" id=6]
 resource_name = "walk_front"
 length = 0.8
 loop = true
@@ -104,7 +104,7 @@ tracks/0/keys = {
 "values": [ 4, 5, 6, 7 ]
 }
 
-[sub_resource type="Animation" id=11]
+[sub_resource type="Animation" id=7]
 resource_name = "walk_right"
 loop = true
 step = 0.2
@@ -121,7 +121,7 @@ tracks/0/keys = {
 "values": [ 8, 9, 10, 11, 12 ]
 }
 
-[sub_resource type="Animation" id=14]
+[sub_resource type="Animation" id=8]
 length = 0.8
 loop = true
 tracks/0/type = "value"
@@ -139,8 +139,8 @@ tracks/0/keys = {
 
 [node name="mark" type="Node2D"]
 script = ExtResource( 66 )
-global_id = "guybrush"
-color = Color( 0.341176, 0.788235, 0.317647, 1 )
+global_id = "mark"
+color = Color( 0.87451, 0.0117647, 0.0117647, 1 )
 speech_position_path = NodePath("../mark/speech_position")
 walk_speed = 200.0
 
@@ -151,12 +151,12 @@ offset = Vector2( 0, -35 )
 
 [node name="animation" type="AnimationPlayer" parent="."]
 anims/idle_front = SubResource( 2 )
-anims/idle_right = SubResource( 6 )
-anims/idle_rightfront = SubResource( 7 )
-anims/idle_up = SubResource( 9 )
-anims/walk_front = SubResource( 10 )
-anims/walk_right = SubResource( 11 )
-anims/walk_up = SubResource( 14 )
+anims/idle_right = SubResource( 3 )
+anims/idle_rightfront = SubResource( 4 )
+anims/idle_up = SubResource( 5 )
+anims/walk_front = SubResource( 6 )
+anims/walk_right = SubResource( 7 )
+anims/walk_up = SubResource( 8 )
 
 [node name="speech_position" type="Position2D" parent="."]
 position = Vector2( 0.663422, -246.129 )
