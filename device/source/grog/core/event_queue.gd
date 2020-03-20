@@ -1,4 +1,3 @@
-
 class_name EventQueue
 
 enum State {
@@ -10,30 +9,22 @@ var target
 
 var started = false
 var state = State.Idle
-var total_time = 0.0
 
 var _pending_actions = []
 var _routine = null
-
-var is_blocked = false
-var _timer_on = false
-var _become_idle_when = null
 
 func start(p_target):
 	target = p_target
 	
 	started = true
-	total_time = 0.0
 	
 	_routine = coroutine()
 	
 	var _ret = grog.connect("grog_update", self, "grog_update")
 	
 func grog_update(delta):
-	total_time += delta
-
 	if _routine:
-		_routine = _routine.resume()
+		_routine = _routine.resume(delta)
 
 func coroutine():
 	state = State.Idle
@@ -50,29 +41,40 @@ func coroutine():
 		while true:
 			var next_action = _pending_actions.pop_front()
 			
-			var action_result = target.do_action(next_action)
+			# TODO only allow actions (not raw instructions)
+			
+			var is_method = next_action.has("method")
+			var is_instruction = next_action.has("command")
+			
+			if is_method and is_instruction:
+				push_warning("Parameter 'command' has no effect if 'method' is present")
+			
+			var action_result
+			if next_action.has("method"):
+				action_result = target.callv(next_action.method, next_action.params)
+			else:
+				action_result = target.execute_instruction(next_action)
 			
 			if action_result.block:
-				is_blocked = true
-				
-				if action_result.has("delay"):
-					var current = get_current_time()
-					_timer_on = true
-					_become_idle_when = within_seconds(current, action_result.delay)
-				
-				# else it is blocked until is_blocked is set to false manually
-				
-				# Start blocking action
-				while is_blocked:
-					yield()
+				if action_result.has("routine"):
+					if action_result.has("delay"):
+						push_warning("Parameter 'delay' has no effect if 'routine' is present")
 					
-					if _timer_on:
-						var current_time = get_current_time()
-						if _become_idle_when <= current_time:
-							is_blocked = false
-				# End of blocking action
-				
-				_timer_on = false
+					var subroutine = action_result.routine
+					
+					while subroutine:
+						var delta = yield()
+						subroutine = subroutine.resume(delta)
+					
+				elif action_result.has("delay"):
+					var delay = action_result.delay
+					
+					var elapsed = 0.0
+					
+					while elapsed < delay:
+						elapsed += yield()
+				else:
+					push_error("Blocking action must have either 'routine' or 'delay parameter'")
 			
 			if not _pending_actions:
 				set_ready()
@@ -96,11 +98,3 @@ func push_action(action):
 func push_actions(action_list):
 	for action in action_list:
 		push_action(action)
-
-####### Time
-
-func get_current_time():
-	return OS.get_ticks_msec()
-
-func within_seconds(current_time, seconds):
-	return current_time + 1000 * seconds

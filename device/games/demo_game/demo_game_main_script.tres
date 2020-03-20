@@ -36,6 +36,12 @@ guybrush.say \"Ok.\"
 
 .wait 2 seconds
 
-bust.say \"What's happening here?\"
+bust.say \"Come here Guybrush.\"
+
+guybrush.walk to=pos3
+
+guybrush.say \"What?\"
+
+bust.say \"Nothing.\"
 
 .wait 1 seconds"

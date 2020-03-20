@@ -53,6 +53,9 @@ position = Vector2( -298.231, 700 )
 [node name="pos2" type="Position2D" parent="."]
 position = Vector2( 21.35, 700 )
 
+[node name="pos3" type="Position2D" parent="."]
+position = Vector2( 231.293, 555.372 )
+
 [node name="items" type="Node2D" parent="."]
 
 [node name="bust" type="Node2D" parent="items"]

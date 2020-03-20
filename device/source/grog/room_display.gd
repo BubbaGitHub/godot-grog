@@ -100,7 +100,7 @@ func on_set_ready():
 #	@PRIVATE
 
 func _left_click(at_position):
-	server.left_click(at_position)
+	server.go_to(at_position)
 	
 func _say_text(speech, color, text_position):
 	_hide_controls()

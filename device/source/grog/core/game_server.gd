@@ -82,29 +82,30 @@ func run_script(script_resource: Resource, routine_name: String):
 func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
 	if compiled_script.has_routine(routine_name):
 		var instructions = compiled_script.get_routine(routine_name)
-
+		
+		# TODO push actions instead of raw instructions
 		event_queue.push_actions(instructions)
 	else:
 		print("Routine '%s' not found" % routine_name)
 
-func do_action(action: Dictionary) -> Dictionary:
-	if action.subject:
-		var item = get_item_named(action.subject)
+func execute_instruction(instruction: Dictionary) -> Dictionary:
+	if instruction.subject:
+		var item = get_item_named(instruction.subject)
 		if not item:
-			print("Unknown subject '%s'" % action.subject)
+			print("Unknown subject '%s'" % instruction.subject)
 			return empty_action
 		
 		if not item.is_active():
-			print("Item '%s' is inactive" % action.subject)
+			print("Item '%s' is inactive" % instruction.subject)
 			return empty_action
 		
-		return do_item_action(item, action)
+		return execute_item_instruction(item, instruction)
 	else:
-		return do_global_action(action)
+		return execute_global_instruction(instruction)
 
-func do_global_action(action: Dictionary) -> Dictionary:
-	var params = action.params
-	match action.command:
+func execute_global_instruction(instruction: Dictionary) -> Dictionary:
+	var params = instruction.params
+	match instruction.command:
 		"load_room":
 			if params.size() < 1:
 				print("One parameter needed for load_room")
@@ -130,15 +131,14 @@ func do_global_action(action: Dictionary) -> Dictionary:
 				return empty_action
 			
 			var actor_name = params[0]
-			var starting_position = current_room.get_default_player_position()
+			var starting_position
 			
-			var at_parameter = get_parameter(params, "at")
+			var at_parameter: Node = get_parameter_as_room_node(params, "at", 1)
+			
 			if at_parameter:
-				var position_holder = current_room.get_node(at_parameter)
-				if position_holder:
-					starting_position = position_holder.position
-				else:
-					print("Room child '%s' not found" % at_parameter)
+				starting_position = at_parameter.position
+			else:
+				starting_position = current_room.get_default_player_position()
 			
 			var actor = load_actor(actor_name, starting_position)
 			
@@ -161,35 +161,60 @@ func do_global_action(action: Dictionary) -> Dictionary:
 			return say(null, params)
 		
 		_:
-			print("Unknown instruction '%s'" % action.command)
+			print("Unknown instruction '%s'" % instruction.command)
 
 	return empty_action
 
-func get_parameter(params: Array, param_name: String) -> String:
-	for i in range(1, params.size()):
+func execute_item_instruction(item: Node, instruction: Dictionary) -> Dictionary:
+	var params = instruction.params
+	match instruction.command:
+		"say":
+			return say(item, params)
+		"walk":
+			var to_parameter: Node = get_parameter_as_room_node(params, "to")
+	
+			if not to_parameter:
+				print("parameter 'to' needed for walk")
+				return empty_action
+			
+			var target_position = to_parameter.position
+			
+			return walk(item, target_position)
+
+	return empty_action
+
+##############################
+
+func get_parameter(params: Array, param_name: String, first_index = 0) -> String:
+	for i in range(first_index, params.size()):
 		var full_param: String = params[i]
 		var prefix = param_name + "="
 		if full_param.begins_with(prefix):
 			return full_param.substr(prefix.length())
 	return ""
 
+func get_parameter_as_room_node(params: Array, param_name: String, first_index = 0) -> Node:
+	if not current_room:
+		return null
+	
+	var node_name = get_parameter(params, param_name, first_index)
+	
+	if not node_name:
+		return null
+	
+	if current_room.has_node(node_name):
+		return current_room.get_node(node_name)
+	
+	print("Room child '%s' not found" % node_name)
+	
+	return null
 ##############################
 
-func do_item_action(item: Node, action: Dictionary) -> Dictionary:
-	var params = action.params
-	match action.command:
-		"say":
-			return say(item, params)
-
-	return empty_action
-
-##############################
-
-func say(item, params):
+func say(item, params: Array):
 	if params.size() < 1:
 		print("One parameter needed for say")
 		return empty_action
-			
+	
 	# TODO
 	var delay_seconds = 1.0
 	var speech = params[0]
@@ -198,7 +223,54 @@ func say(item, params):
 	
 	return { block = true, delay = delay_seconds }
 
-##############################
+func walk(actor, target_position: Vector2, global = false) -> Dictionary:
+	var nav : Navigation2D = current_room.get_navigation()
+	
+	if not nav:
+		return empty_action
+	
+	if global:
+		target_position = target_position - nav.global_position
+	
+	target_position = nav.get_closest_point(target_position)
+	
+	var current_position = actor.position
+	
+	var path = nav.get_simple_path(current_position, target_position)
+	
+	return { block = true, routine = walk_routine(actor, path) }
+
+func walk_routine(item, path: PoolVector2Array):
+	while path.size() >= 2:
+		var time = 0.0
+	
+		var origin: Vector2 = path[0]
+		var destiny: Vector2 = path[1]
+		
+		var displacement = destiny - origin
+		var distance2 = displacement.length_squared()
+		var direction = displacement.normalized()
+		
+		item.emit_signal("start_walking", direction)
+		
+		var finish_step = false
+		
+		while not finish_step:
+			time += yield()
+			
+			var step_distance = item.walk_speed * time
+			
+			var target_point = origin + step_distance * direction
+			if pow(step_distance, 2) >= distance2:
+				item.teleport(destiny)
+				finish_step = true
+			else:
+				item.teleport(target_point)
+			
+		path.remove(0)
+	
+	item.emit_signal("stop_walking")
+	
 
 func load_room(room_name: String) -> Node:
 	var room_resource = get_room(room_name)
@@ -263,21 +335,6 @@ func load_actor(actor_name: String, starting_position: Vector2) -> Node:
 	
 	return actor
 
-func walk_to(actor, target_position):
-	var nav : Navigation2D = current_room.get_navigation()
-	
-	if not nav:
-		return
-	
-	var relative_target_position = target_position - nav.global_position
-	var relative_final_target = nav.get_closest_point(relative_target_position)
-	
-	var current_position = actor.position
-	
-	var path = nav.get_simple_path(current_position, relative_final_target)
-	
-	actor.walk(path)
-
 ##############################
 
 func server_event(event_name: String, args: Array = []):
@@ -291,15 +348,15 @@ func is_ready():
 func has_started():
 	return event_queue.started
 	
-func left_click(target_position: Vector2):
-	if not event_queue.is_ready():
-		print("Rejecting click")
-		return
-	
+func go_to(target_position: Vector2):
 	if not current_player or not current_player.is_ready():
 		return
 	
-	walk_to(current_player, target_position)
+	event_queue.push_action({
+		method = "walk",
+		params = [current_player, target_position, true]
+	})
+	
 
 #### Finding items
 
