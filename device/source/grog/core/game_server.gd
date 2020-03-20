@@ -88,116 +88,98 @@ func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
 	else:
 		print("Routine '%s' not found" % routine_name)
 
-func execute_instruction(instruction: Dictionary) -> Dictionary:
-	if instruction.subject:
-		var item = get_item_named(instruction.subject)
-		if not item:
-			print("Unknown subject '%s'" % instruction.subject)
-			return empty_action
-		
-		if not item.is_active():
-			print("Item '%s' is inactive" % instruction.subject)
-			return empty_action
-		
-		return execute_item_instruction(item, instruction)
-	else:
-		return execute_global_instruction(instruction)
-
-func execute_global_instruction(instruction: Dictionary) -> Dictionary:
-	var params = instruction.params
-	match instruction.command:
-		"load_room":
-			if params.size() < 1:
-				print("One parameter needed for load_room")
-				return empty_action
-			
-			var room_name = params[0]
-			
-			var room = load_room(room_name)
-			
-			if room:
-				# TODO check this (clearing player when loading new room)
-				current_player = null
-			else:
-				print("Couldn't load room '%s'" % room_name)
-		
-		"load_actor":
-			if not current_room:
-				print("There's no room so can't load actor")
-				return empty_action
-			
-			if params.size() < 1:
-				print("One parameter needed for load_actor")
-				return empty_action
-			
-			var actor_name = params[0]
-			var starting_position
-			
-			var at_parameter: Node = get_parameter_as_room_node(params, "at", 1)
-			
-			if at_parameter:
-				starting_position = at_parameter.position
-			else:
-				starting_position = current_room.get_default_player_position()
-			
-			var actor = load_actor(actor_name, starting_position)
-			
-			if not actor:
-				print("Couldn't load actor '%s'" % actor_name)
-			
-		"wait":
-			if params.size() < 1:
-				print("One parameter needed for wait")
-				return empty_action
-			
-			var time_param = params[0]
-			var delay_seconds = float(time_param)
-			
-			server_event("wait_started", [delay_seconds])
-			
-			return { block = true, delay = delay_seconds }
-			
-		"say":
-			return say(null, params)
-		
-		_:
-			print("Unknown instruction '%s'" % instruction.command)
-
-	return empty_action
-
-func execute_item_instruction(item: Node, instruction: Dictionary) -> Dictionary:
-	var params = instruction.params
-	match instruction.command:
-		"say":
-			return say(item, params)
-		"walk":
-			var to_parameter: Node = get_parameter_as_room_node(params, "to")
-	
-			if not to_parameter:
-				print("parameter 'to' needed for walk")
-				return empty_action
-			
-			var target_position = to_parameter.position
-			
-			return walk(item, target_position)
-
-	return empty_action
-
 ##############################
 
-func get_parameter(params: Array, param_name: String, first_index = 0) -> String:
-	for i in range(first_index, params.size()):
+#	@COMMANDS
+
+func load_room(room_name: String, _params = []):
+	var room = _load_room(room_name)
+	
+	if room:
+		# TODO check this (clearing player when loading new room)
+		current_player = null
+	else:
+		print("Couldn't load room '%s'" % room_name)
+	
+	return empty_action
+
+func load_actor(actor_name: String, params = []):
+	var starting_position
+
+	var at_parameter: Node = get_parameter_as_room_node(params, "at")
+
+	if at_parameter:
+		starting_position = at_parameter.position
+	else:
+		starting_position = current_room.get_default_player_position()
+
+	var actor = _load_actor(actor_name, starting_position)
+	
+	if not actor:
+		print("Couldn't load actor '%s'" % actor_name)
+		return
+	
+	# TODO
+	if not current_player:
+		current_player = actor
+	
+	return empty_action
+
+func wait(time_param: String, _params = []):
+	var delay_seconds = float(time_param)
+	
+	server_event("wait_started", [delay_seconds])
+	
+	return { block = true, delay = delay_seconds }
+
+func say(item_name: String, speech: String, _params = []):
+	var item = null
+	if item_name:
+		item = get_item_named(item_name)
+		if not item:
+			return empty_action
+	
+	# TODO
+	var delay_seconds = 1.0
+	
+	server_event("say", [item, speech, delay_seconds])
+	
+	return { block = true, delay = delay_seconds }
+
+func walk(item_name: String, params: Array):
+	if not item_name:
+		return empty_action
+	
+	var item = get_item_named(item_name)
+	if not item:
+		return empty_action
+	
+	var to_parameter: Node = get_parameter_as_room_node(params, "to")
+
+	if not to_parameter:
+		print("parameter 'to' needed for walk")
+		return empty_action
+	
+	var target_position = to_parameter.position
+	
+	return _walk_to(item, target_position)
+	
+	
+##############################
+
+func get_parameter(params: Array, param_name: String) -> String:
+	for i in range(0, params.size()):
 		var full_param: String = params[i]
 		var prefix = param_name + "="
 		if full_param.begins_with(prefix):
 			return full_param.substr(prefix.length())
 	return ""
 
-func get_parameter_as_room_node(params: Array, param_name: String, first_index = 0) -> Node:
+func get_parameter_as_room_node(params: Array, param_name: String) -> Node:
 	if not current_room:
 		return null
 	
-	var node_name = get_parameter(params, param_name, first_index)
+	var node_name = get_parameter(params, param_name)
 	
 	if not node_name:
 		return null
@@ -208,71 +190,10 @@ func get_parameter_as_room_node(params: Array, param_name: String, first_index =
 	print("Room child '%s' not found" % node_name)
 	
 	return null
+	
 ##############################
 
-func say(item, params: Array):
-	if params.size() < 1:
-		print("One parameter needed for say")
-		return empty_action
-	
-	# TODO
-	var delay_seconds = 1.0
-	var speech = params[0]
-	
-	server_event("say", [item, speech, delay_seconds])
-	
-	return { block = true, delay = delay_seconds }
-
-func walk(actor, target_position: Vector2, global = false) -> Dictionary:
-	var nav : Navigation2D = current_room.get_navigation()
-	
-	if not nav:
-		return empty_action
-	
-	if global:
-		target_position = target_position - nav.global_position
-	
-	target_position = nav.get_closest_point(target_position)
-	
-	var current_position = actor.position
-	
-	var path = nav.get_simple_path(current_position, target_position)
-	
-	return { block = true, routine = walk_routine(actor, path) }
-
-func walk_routine(item, path: PoolVector2Array):
-	while path.size() >= 2:
-		var time = 0.0
-	
-		var origin: Vector2 = path[0]
-		var destiny: Vector2 = path[1]
-		
-		var displacement = destiny - origin
-		var distance2 = displacement.length_squared()
-		var direction = displacement.normalized()
-		
-		item.emit_signal("start_walking", direction)
-		
-		var finish_step = false
-		
-		while not finish_step:
-			time += yield()
-			
-			var step_distance = item.walk_speed * time
-			
-			var target_point = origin + step_distance * direction
-			if pow(step_distance, 2) >= distance2:
-				item.teleport(destiny)
-				finish_step = true
-			else:
-				item.teleport(target_point)
-			
-		path.remove(0)
-	
-	item.emit_signal("stop_walking")
-	
-
-func load_room(room_name: String) -> Node:
+func _load_room(room_name: String) -> Node:
 	var room_resource = get_room(room_name)
 	if not room_resource:
 		print("No room '%s'" % room_name)
@@ -307,7 +228,7 @@ func load_room(room_name: String) -> Node:
 
 	return room
 
-func load_actor(actor_name: String, starting_position: Vector2) -> Node:
+func _load_actor(actor_name: String, starting_position: Vector2) -> Node:
 	var actor_resource = get_actor(actor_name)
 	if not actor_resource:
 		print("No actor '%s'" % actor_name)
@@ -325,16 +246,60 @@ func load_actor(actor_name: String, starting_position: Vector2) -> Node:
 	
 	current_room.add_child(actor)
 	
-	# TODO
-	if not current_player:
-		current_player = actor
-	
 	actor.teleport(starting_position)
 	
 	server_event("actor_loaded", [actor])
 	
 	return actor
 
+func _walk_to(actor, target_position: Vector2, global = false) -> Dictionary:
+	var nav : Navigation2D = current_room.get_navigation()
+	
+	if not nav:
+		return empty_action
+	
+	if global:
+		target_position = target_position - nav.global_position
+	
+	target_position = nav.get_closest_point(target_position)
+	
+	var current_position = actor.position
+	
+	var path = nav.get_simple_path(current_position, target_position)
+	
+	return { block = true, routine = _walk_routine(actor, path) }
+
+func _walk_routine(item, path: PoolVector2Array):
+	while path.size() >= 2:
+		var time = 0.0
+	
+		var origin: Vector2 = path[0]
+		var destiny: Vector2 = path[1]
+		
+		var displacement = destiny - origin
+		var distance2 = displacement.length_squared()
+		var direction = displacement.normalized()
+		
+		item.emit_signal("start_walking", direction)
+		
+		var finish_step = false
+		
+		while not finish_step:
+			time += yield()
+			
+			var step_distance = item.walk_speed * time
+			
+			var target_point = origin + step_distance * direction
+			if pow(step_distance, 2) >= distance2:
+				item.teleport(destiny)
+				finish_step = true
+			else:
+				item.teleport(target_point)
+			
+		path.remove(0)
+	
+	item.emit_signal("stop_walking")
+	
 ##############################
 
 func server_event(event_name: String, args: Array = []):
@@ -353,7 +318,7 @@ func go_to(target_position: Vector2):
 		return
 	
 	event_queue.push_action({
-		method = "walk",
+		command = "_walk_to",
 		params = [current_player, target_position, true]
 	})
 	
@@ -361,6 +326,18 @@ func go_to(target_position: Vector2):
 #### Finding items
 
 func get_item_named(item_name: String) -> Node:
+	var item = find_item_named(item_name)
+	if not item:
+		print("Unknown item '%s'" % item_name)
+		return null
+	
+	if not item.is_active():
+		print("Item '%s' is inactive" % item_name)
+		return null
+	
+	return item
+	
+func find_item_named(item_name: String) -> Node:
 	# TODO make it efficient
 	var items = grog.tree.get_nodes_in_group("item")
 	

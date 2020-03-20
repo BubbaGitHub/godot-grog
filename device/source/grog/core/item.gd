@@ -18,8 +18,7 @@ func _ready():
 	add_to_group("item")
 
 func is_ready():
-	# TODO
-	print("Implement me or remove me!")
+	# TODO implement or remove
 	return true
 
 ##############################

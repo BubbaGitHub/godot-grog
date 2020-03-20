@@ -41,19 +41,7 @@ func coroutine():
 		while true:
 			var next_action = _pending_actions.pop_front()
 			
-			# TODO only allow actions (not raw instructions)
-			
-			var is_method = next_action.has("method")
-			var is_instruction = next_action.has("command")
-			
-			if is_method and is_instruction:
-				push_warning("Parameter 'command' has no effect if 'method' is present")
-			
-			var action_result
-			if next_action.has("method"):
-				action_result = target.callv(next_action.method, next_action.params)
-			else:
-				action_result = target.execute_instruction(next_action)
+			var action_result = target.callv(next_action.command, next_action.params)
 			
 			if action_result.block:
 				if action_result.has("routine"):

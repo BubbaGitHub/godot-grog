@@ -7,7 +7,6 @@ const token_char_regex_pattern = "[a-zA-Z0-9\\.\\:\\-\\_]"
 
 # Compiler patterns
 const token_regex_pattern = "^\\:?([a-zA-Z0-9\\.\\-\\_\\'\\?\\=\\ \\#]+)$"
-#const action_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
 
 const command_regex_pattern = "^([a-zA-Z0-9\\-\\_\\ \\#]*).([a-zA-Z0-9\\-\\_\\ \\#]+)$"
 
@@ -62,16 +61,42 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
 			var statement_line = lines[i]
 			i += 1
 			
-			# TODO check commands and params
-			
 			var subject = statement_line.subject
 			var command = statement_line.command
 			var params = statement_line.tokens.slice(1, statement_line.tokens.size() - 1)
 			
+			if not grog.commands.has(command):
+				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, current_line.line_number])
+				return compiled_script
+			
+			var command_requirements = grog.commands[command]
+			
+			if subject and not command_requirements.has_subject:
+				compiled_script.add_error("Command '%s' can't has subject (line %s)" % [command, current_line.line_number])
+				return compiled_script
+			
+			var total = params.size()
+			var required = command_requirements.required_params
+			
+			if total < required:
+				compiled_script.add_error("Command '%s' needs at least %s parameters (line %s)" % [command, required, current_line.line_number])
+				return compiled_script
+			
+			var final_params = []
+			
+			if command_requirements.has_subject:
+				final_params.append(subject)
+			
+			# saves required parameters
+			for _j in range(0, required):
+				final_params.append(params.pop_front())
+			
+			# saves array of optional parameters
+			final_params.append(params)
+			
 			statements.append({
-				subject = subject,
 				command = command,
-				params = params
+				params = final_params
 			})
 		
 		compiled_script.add_routine(action_name, statements)

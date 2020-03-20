@@ -66,10 +66,10 @@ func _on_quit_button_pressed():
 	
 func test_room(_room_resource, _actor_resource):
 	var compiled_script = CompiledGrogScript.new()
-	var start_routine = [{ subject = "", command = "load_room", params = [_room_resource.get_name()] }]
+	var start_routine = [{ command = "load_room", params = [_room_resource.get_name()] }]
 	
 	if _actor_resource:
-		start_routine.append({ subject = "", command = "load_actor", params = [_actor_resource.get_name()] })
+		start_routine.append({ command = "load_actor", params = [_actor_resource.get_name()] })
 	
 	compiled_script.add_routine("start", start_routine)
 	
