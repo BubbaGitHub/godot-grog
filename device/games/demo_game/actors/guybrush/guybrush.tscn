@@ -265,6 +265,7 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=14]
 length = 1.2
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:frame")
 tracks/0/interp = 1
@@ -310,6 +311,23 @@ position = Vector2( 0.663422, -246.129 )
 
 [node name="ndirections" type="Node" parent="."]
 script = ExtResource( 67 )
+config = [ {
+"idle": "idle_right",
+"value": 45.0,
+"walk": "walk_left.flip_h"
+}, {
+"idle": "idle_front",
+"value": 135.0,
+"walk": "walk_front"
+}, {
+"idle": "idle_left",
+"value": 225.0,
+"walk": "walk_left"
+}, {
+"idle": "idle_up",
+"value": 315.0,
+"walk": "walk_up"
+} ]
 animation_path = NodePath("../animation")
 sprite_path = NodePath("../Sprite")
 [connection signal="start_walking" from="." to="ndirections" method="_on_start_walking"]

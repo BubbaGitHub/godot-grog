@@ -3,28 +3,7 @@ extends Node
 # Each direction ends in one angle.
 # The angles must be positive and increasing.
 # 0.0 is facing right, 90.0 front, etc...
-export (Array, Dictionary) var config = [
-	{
-		value = 45.0,
-		idle = "idle_right",
-		walk = "walk_left.flip_h"
-	},
-	{
-		value = 135.0,
-		idle = "idle_front",
-		walk = "walk_front"
-	},
-	{
-		value = 225.0,
-		idle = "idle_left",
-		walk = "walk_left"
-	},
-	{
-		value = 315.0,
-		idle = "idle_up",
-		walk = "walk_up"
-	},
-]
+export (Array, Dictionary) var config = []
 
 export (NodePath) var animation_path
 export (NodePath) var sprite_path

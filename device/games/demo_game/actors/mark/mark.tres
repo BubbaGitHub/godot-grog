@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://source/grog/core/actor_resource.gd" type="Script" id=1]
+[ext_resource path="res://games/demo_game/actors/mark/mark.tscn" type="PackedScene" id=2]
+
+[resource]
+resource_name = "mark"
+script = ExtResource( 1 )
+actor_scene = ExtResource( 2 )

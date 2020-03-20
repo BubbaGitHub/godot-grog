@@ -1,0 +1,194 @@
+[gd_scene load_steps=28 format=2]
+
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark11.png" type="Texture" id=1]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark12.png" type="Texture" id=2]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark9.png" type="Texture" id=3]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark10.png" type="Texture" id=4]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark7.png" type="Texture" id=5]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark4.png" type="Texture" id=6]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark1.png" type="Texture" id=7]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark13.png" type="Texture" id=8]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark2.png" type="Texture" id=9]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark8.png" type="Texture" id=10]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark3.png" type="Texture" id=11]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark14.png" type="Texture" id=12]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark17.png" type="Texture" id=13]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark16.png" type="Texture" id=14]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark15.png" type="Texture" id=15]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark18.png" type="Texture" id=16]
+[ext_resource path="res://games/demo_game/actors/mark/sprites/mark19.png" type="Texture" id=17]
+[ext_resource path="res://source/grog/2d/item2d.gd" type="Script" id=66]
+[ext_resource path="res://source/grog/2d/ndirections_sprite.gd" type="Script" id=67]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 7 ), ExtResource( 9 ), ExtResource( 11 ), ExtResource( 6 ), ExtResource( 5 ), ExtResource( 10 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 1 ), ExtResource( 2 ), ExtResource( 8 ), ExtResource( 12 ), ExtResource( 15 ), ExtResource( 14 ), ExtResource( 13 ), ExtResource( 16 ), ExtResource( 17 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="Animation" id=2]
+resource_name = "idle_front"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=6]
+resource_name = "idle_right"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 2 ]
+}
+
+[sub_resource type="Animation" id=7]
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 1 ]
+}
+
+[sub_resource type="Animation" id=9]
+resource_name = "idle_up"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 3 ]
+}
+
+[sub_resource type="Animation" id=10]
+resource_name = "walk_front"
+length = 0.8
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2, 0.4, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 4, 5, 6, 7 ]
+}
+
+[sub_resource type="Animation" id=11]
+resource_name = "walk_right"
+loop = true
+step = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2, 0.4, 0.6, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 8, 9, 10, 11, 12 ]
+}
+
+[sub_resource type="Animation" id=14]
+length = 0.8
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2, 0.4, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 13, 14, 15, 47 ]
+}
+
+[node name="mark" type="Node2D"]
+script = ExtResource( 66 )
+global_id = "guybrush"
+color = Color( 0.341176, 0.788235, 0.317647, 1 )
+speech_position_path = NodePath("../mark/speech_position")
+walk_speed = 200.0
+
+[node name="Sprite" type="AnimatedSprite" parent="."]
+scale = Vector2( 4, 4 )
+frames = SubResource( 1 )
+offset = Vector2( 0, -35 )
+
+[node name="animation" type="AnimationPlayer" parent="."]
+anims/idle_front = SubResource( 2 )
+anims/idle_right = SubResource( 6 )
+anims/idle_rightfront = SubResource( 7 )
+anims/idle_up = SubResource( 9 )
+anims/walk_front = SubResource( 10 )
+anims/walk_right = SubResource( 11 )
+anims/walk_up = SubResource( 14 )
+
+[node name="speech_position" type="Position2D" parent="."]
+position = Vector2( 0.663422, -246.129 )
+
+[node name="ndirections" type="Node" parent="."]
+script = ExtResource( 67 )
+config = [ {
+"idle": "idle_right",
+"value": 22.5,
+"walk": "walk_right"
+}, {
+"idle": "idle_rightfront",
+"value": 67.5,
+"walk": "walk_front"
+}, {
+"idle": "idle_front",
+"value": 112.5,
+"walk": "walk_front"
+}, {
+"idle": "idle_rightfront.flip_h",
+"value": 135.0,
+"walk": "walk_front"
+}, {
+"idle": "idle_right.flip_h",
+"value": 225.0,
+"walk": "walk_right.flip_h"
+}, {
+"idle": "idle_up",
+"value": 315.0,
+"walk": "walk_up"
+} ]
+animation_path = NodePath("../animation")
+sprite_path = NodePath("../Sprite")
+[connection signal="start_walking" from="." to="ndirections" method="_on_start_walking"]
+[connection signal="stop_walking" from="." to="ndirections" method="_on_stop_walking"]
