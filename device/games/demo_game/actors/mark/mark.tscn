@@ -140,12 +140,12 @@ tracks/0/keys = {
 [node name="mark" type="Node2D"]
 script = ExtResource( 66 )
 global_id = "mark"
-color = Color( 0.87451, 0.0117647, 0.0117647, 1 )
+color = Color( 0.933594, 0.700195, 0.700195, 1 )
 speech_position_path = NodePath("../mark/speech_position")
 walk_speed = 200.0
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
-scale = Vector2( 4, 4 )
+scale = Vector2( 4.5, 4.5 )
 frames = SubResource( 1 )
 offset = Vector2( 0, -35 )
 
@@ -159,7 +159,7 @@ anims/walk_right = SubResource( 7 )
 anims/walk_up = SubResource( 8 )
 
 [node name="speech_position" type="Position2D" parent="."]
-position = Vector2( 0, -270 )
+position = Vector2( 0, -330 )
 
 [node name="ndirections" type="Node" parent="."]
 script = ExtResource( 67 )

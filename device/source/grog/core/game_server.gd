@@ -121,13 +121,26 @@ func do_global_action(action: Dictionary) -> Dictionary:
 				print("Couldn't load room '%s'" % room_name)
 		
 		"load_actor":
+			if not current_room:
+				print("There's no room so can't load actor")
+				return empty_action
+			
 			if params.size() < 1:
 				print("One parameter needed for load_actor")
 				return empty_action
 			
 			var actor_name = params[0]
+			var starting_position = current_room.get_default_player_position()
 			
-			var actor = load_actor(actor_name)
+			var at_parameter = get_parameter(params, "at")
+			if at_parameter:
+				var position_holder = current_room.get_node(at_parameter)
+				if position_holder:
+					starting_position = position_holder.position
+				else:
+					print("Room child '%s' not found" % at_parameter)
+			
+			var actor = load_actor(actor_name, starting_position)
 			
 			if not actor:
 				print("Couldn't load actor '%s'" % actor_name)
@@ -151,6 +164,16 @@ func do_global_action(action: Dictionary) -> Dictionary:
 			print("Unknown instruction '%s'" % action.command)
 
 	return empty_action
+
+func get_parameter(params: Array, param_name: String) -> String:
+	for i in range(1, params.size()):
+		var full_param: String = params[i]
+		var prefix = param_name + "="
+		if full_param.begins_with(prefix):
+			return full_param.substr(prefix.length())
+	return ""
+
+##############################
 
 func do_item_action(item: Node, action: Dictionary) -> Dictionary:
 	var params = action.params
@@ -212,7 +235,7 @@ func load_room(room_name: String) -> Node:
 
 	return room
 
-func load_actor(actor_name: String) -> Node:
+func load_actor(actor_name: String, starting_position: Vector2) -> Node:
 	var actor_resource = get_actor(actor_name)
 	if not actor_resource:
 		print("No actor '%s'" % actor_name)
@@ -234,7 +257,7 @@ func load_actor(actor_name: String) -> Node:
 	if not current_player:
 		current_player = actor
 	
-	actor.teleport(current_room.get_player_default_position())
+	actor.teleport(starting_position)
 	
 	server_event("actor_loaded", [actor])
 	

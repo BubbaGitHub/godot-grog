@@ -4,26 +4,38 @@
 
 [resource]
 script = ExtResource( 1 )
-code_or_filename = "# example grog file
-
+code_or_filename = "
 :start
 
+.load_room room2
+
+.wait 2 seconds
+
+.say \"A long long time ago...\"
+
+.wait 2 seconds
+
+.load_room room1
+
+.load_actor guybrush at=pos1
+.load_actor mark at=pos2
+
+.wait 2 seconds
+
+guybrush.say \"Hi.\"
+mark.say \"Hi.\"
+
+.wait 0.7 seconds
+
+guybrush.say \"How are you doing?\"
+mark.say \"I'm just fine.\"
+
 .wait 1 seconds
 
-.load_room \"room1\"
+guybrush.say \"Ok.\"
 
-.wait 1 seconds
+.wait 2 seconds
 
-.load_actor guybrush
+bust.say \"What's happening here?\"
 
-.wait 1 seconds
-
-bust.say \"Hi\"
-bust.say \"How are you?\"
-
-guybrush.say \"Fine\"
-
-.wait 1 seconds
-
-#.load_room \"room2\"
-"
+.wait 1 seconds"

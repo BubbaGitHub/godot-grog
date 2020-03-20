@@ -2,11 +2,16 @@ extends Node
 
 export (Resource) var game_to_load
 
-onready var _ui = $ui
-onready var _display = $display
+export (NodePath) var ui_path
+export (NodePath) var display_path
+export (NodePath) var room_list_path
+export (NodePath) var actor_list_path
 
-onready var _room_list = $ui/test_rooms/room_list
-onready var _actor_list = $ui/test_rooms/actor_list
+onready var _ui = get_node(ui_path)
+onready var _display = get_node(display_path)
+
+onready var _room_list = get_node(room_list_path)
+onready var _actor_list = get_node(actor_list_path)
 
 var _grog_game = null
 

@@ -1,15 +1,15 @@
 extends Node2D
 
-export (NodePath) var player_place_path
+export (NodePath) var default_player_position_path
 export (NodePath) var navigation_path
 
 func start_room():
 	pass
 	
-func get_player_default_position():
-	var player_spot = get_node_if_present(player_place_path)
-	if player_spot:
-		return player_spot.position
+func get_default_player_position():
+	var default_player_position_holder = get_node_if_present(default_player_position_path)
+	if default_player_position_holder:
+		return default_player_position_holder.position
 
 func get_navigation():
 	return get_node_if_present(navigation_path)

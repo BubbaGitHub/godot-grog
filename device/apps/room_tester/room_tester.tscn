@@ -19,17 +19,23 @@ default_font = SubResource( 1 )
 [node name="room_tester" type="Node"]
 script = ExtResource( 3 )
 game_to_load = ExtResource( 1 )
+ui_path = NodePath("ui_layer/ui")
+display_path = NodePath("display")
+room_list_path = NodePath("ui_layer/ui/test_rooms/room_list")
+actor_list_path = NodePath("ui_layer/ui/test_rooms/actor_list")
 
-[node name="ui" type="Control" parent="."]
+[node name="ui_layer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="ui" type="Control" parent="ui_layer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_bottom = 6.10352e-05
 theme = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ColorRect" type="ColorRect" parent="ui"]
+[node name="ColorRect" type="ColorRect" parent="ui_layer/ui"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.458824, 0.47451, 0.427451, 1 )
@@ -37,7 +43,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="play_game_button" type="Button" parent="ui"]
+[node name="play_game_button" type="Button" parent="ui_layer/ui"]
 margin_left = 1321.5
 margin_top = 193.655
 margin_right = 1724.5
@@ -48,7 +54,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="quit_button" type="Button" parent="ui"]
+[node name="quit_button" type="Button" parent="ui_layer/ui"]
 margin_left = 1313.71
 margin_top = 600.791
 margin_right = 1716.71
@@ -59,7 +65,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="test_rooms" type="Panel" parent="ui"]
+[node name="test_rooms" type="Panel" parent="ui_layer/ui"]
 margin_left = 170.0
 margin_top = 113.0
 margin_right = 1100.0
@@ -68,7 +74,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="room_list" type="Control" parent="ui/test_rooms"]
+[node name="ColorRect" type="ColorRect" parent="ui_layer/ui/test_rooms"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.309333, 0.32, 0.288, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="room_list" type="Control" parent="ui_layer/ui/test_rooms"]
 anchor_right = 0.333
 anchor_bottom = 0.8
 script = ExtResource( 5 )
@@ -78,7 +92,7 @@ __meta__ = {
 item_model = ExtResource( 7 )
 list_path = NodePath("rooms")
 
-[node name="rooms" type="VBoxContainer" parent="ui/test_rooms/room_list"]
+[node name="rooms" type="VBoxContainer" parent="ui_layer/ui/test_rooms/room_list"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 20.0
@@ -89,12 +103,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="header" type="Control" parent="ui/test_rooms/room_list/rooms"]
+[node name="header" type="Control" parent="ui_layer/ui/test_rooms/room_list/rooms"]
 margin_right = 269.0
 margin_bottom = 80.0
 rect_min_size = Vector2( 0, 80 )
 
-[node name="Label" type="Label" parent="ui/test_rooms/room_list/rooms/header"]
+[node name="Label" type="Label" parent="ui_layer/ui/test_rooms/room_list/rooms/header"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_colors/font_color = Color( 0.572549, 0.937255, 0.584314, 1 )
@@ -105,7 +119,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="actor_list" type="Control" parent="ui/test_rooms"]
+[node name="actor_list" type="Control" parent="ui_layer/ui/test_rooms"]
 anchor_left = 0.333
 anchor_right = 0.667
 anchor_bottom = 0.8
@@ -116,7 +130,7 @@ __meta__ = {
 item_model = ExtResource( 8 )
 list_path = NodePath("actors")
 
-[node name="actors" type="VBoxContainer" parent="ui/test_rooms/actor_list"]
+[node name="actors" type="VBoxContainer" parent="ui_layer/ui/test_rooms/actor_list"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 20.0
@@ -127,12 +141,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="header" type="Control" parent="ui/test_rooms/actor_list/actors"]
+[node name="header" type="Control" parent="ui_layer/ui/test_rooms/actor_list/actors"]
 margin_right = 270.0
 margin_bottom = 80.0
 rect_min_size = Vector2( 0, 80 )
 
-[node name="Label" type="Label" parent="ui/test_rooms/actor_list/actors/header"]
+[node name="Label" type="Label" parent="ui_layer/ui/test_rooms/actor_list/actors/header"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_colors/font_color = Color( 0.572549, 0.937255, 0.584314, 1 )
@@ -143,7 +157,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="test_room_button" type="Button" parent="ui/test_rooms"]
+[node name="test_room_button" type="Button" parent="ui_layer/ui/test_rooms"]
 margin_left = 275.512
 margin_top = 621.522
 margin_right = 674.512
@@ -156,6 +170,6 @@ __meta__ = {
 
 [node name="display" parent="." instance=ExtResource( 4 )]
 visible = false
-[connection signal="pressed" from="ui/play_game_button" to="." method="_on_play_game_button_pressed"]
-[connection signal="pressed" from="ui/quit_button" to="." method="_on_quit_button_pressed"]
-[connection signal="pressed" from="ui/test_rooms/test_room_button" to="." method="_on_test_room_button_pressed"]
+[connection signal="pressed" from="ui_layer/ui/play_game_button" to="." method="_on_play_game_button_pressed"]
+[connection signal="pressed" from="ui_layer/ui/quit_button" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="ui_layer/ui/test_rooms/test_room_button" to="." method="_on_test_room_button_pressed"]

@@ -13,9 +13,7 @@ outlines = [ PoolVector2Array( -276.7, 547.05, -541.651, 767.385, 704, 768, 617.
 
 [node name="room1" type="Node2D"]
 script = ExtResource( 4 )
-width = 1280
-height = 800
-player_place_path = NodePath("player_position")
+default_player_position_path = NodePath("default_player_position")
 navigation_path = NodePath("Navigation2D")
 
 [node name="background" type="Node2D" parent="."]
@@ -46,8 +44,14 @@ centered = false
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
 navpoly = SubResource( 1 )
 
-[node name="player_position" type="Position2D" parent="."]
-position = Vector2( 15.5182, 692.897 )
+[node name="default_player_position" type="Position2D" parent="."]
+position = Vector2( 591.696, 732.553 )
+
+[node name="pos1" type="Position2D" parent="."]
+position = Vector2( -298.231, 700 )
+
+[node name="pos2" type="Position2D" parent="."]
+position = Vector2( 21.35, 700 )
 
 [node name="items" type="Node2D" parent="."]
 
@@ -55,4 +59,4 @@ position = Vector2( 15.5182, 692.897 )
 position = Vector2( 327.674, 328.927 )
 script = ExtResource( 6 )
 global_id = "bust"
-color = Color( 0.960784, 0.882353, 0.470588, 1 )
+color = Color( 0.76, 0.76, 0.76, 1 )

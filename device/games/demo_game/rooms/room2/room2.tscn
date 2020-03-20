@@ -12,9 +12,7 @@ outlines = [ PoolVector2Array( -276.7, 547.05, -541.651, 767.385, 704, 768, 617.
 
 [node name="room2" type="Node2D"]
 script = ExtResource( 4 )
-width = 1280
-height = 800
-player_place_path = NodePath("../room2/player_position")
+default_player_position_path = NodePath("default_player_position")
 navigation_path = NodePath("../room2/Navigation2D")
 
 [node name="background" type="Node2D" parent="."]
@@ -46,5 +44,5 @@ centered = false
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
 navpoly = SubResource( 1 )
 
-[node name="player_position" type="Position2D" parent="."]
+[node name="default_player_position" type="Position2D" parent="."]
 position = Vector2( 198.515, 719.745 )
