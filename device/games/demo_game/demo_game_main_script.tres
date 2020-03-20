@@ -13,7 +13,7 @@ code_or_filename = "
 
 .say \"A long long time ago...\"
 
-.wait 2 seconds
+.wait 1 seconds
 
 .load_room room1
 

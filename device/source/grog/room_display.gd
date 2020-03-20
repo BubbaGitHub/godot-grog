@@ -80,6 +80,9 @@ func on_wait_started(_seconds):
 	
 	_hide_controls()
 
+func on_wait_ended():
+	_text_label.clear()
+
 func on_say(subject, speech, _seconds):
 	# start waiting '_seconds' seconds
 	
@@ -94,7 +97,7 @@ func on_set_ready():
 	# end waiting
 	
 	_show_controls()
-	_text_label.clear()
+	#_text_label.clear()
 	
 	
 #	@PRIVATE

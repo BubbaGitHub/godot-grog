@@ -140,7 +140,7 @@ func say(item_name: String, speech: String, _params = []):
 			return empty_action
 	
 	# TODO
-	var delay_seconds = 1.0
+	var delay_seconds = 2.0
 	
 	server_event("say", [item, speech, delay_seconds])
 	
@@ -258,9 +258,7 @@ func _wait_routine(delay_seconds: float):
 	while elapsed < delay_seconds:
 		elapsed += yield()
 	
-	#TODO server_event("end_waiting")
-	
-	# ends waiting
+	server_event("wait_ended")
 
 func _walk_to(actor, target_position: Vector2, global = false) -> Dictionary:
 	var nav : Navigation2D = current_room.get_navigation()
