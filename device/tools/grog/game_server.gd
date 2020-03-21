@@ -136,7 +136,7 @@ func load_room(room_name: String, _params = []):
 func load_actor(actor_name: String, params = []):
 	var starting_position
 
-	var at_parameter: Node = get_parameter_as_room_node(params, "at")
+	var at_parameter: Node = get_option_as_room_node(params, "at")
 
 	if at_parameter:
 		starting_position = at_parameter.position
@@ -184,7 +184,7 @@ func walk(item_name: String, params: Array):
 	if not item:
 		return empty_action
 	
-	var to_parameter: Node = get_parameter_as_room_node(params, "to")
+	var to_parameter: Node = get_option_as_room_node(params, "to")
 
 	if not to_parameter:
 		print("parameter 'to' needed for walk")
@@ -197,19 +197,19 @@ func walk(item_name: String, params: Array):
 	
 ##############################
 
-func get_parameter(params: Array, param_name: String) -> String:
+func get_option(params: Array, option_name: String) -> String:
 	for i in range(0, params.size()):
-		var full_param: String = params[i]
-		var prefix = param_name + "="
-		if full_param.begins_with(prefix):
-			return full_param.substr(prefix.length())
+		var param: Dictionary = params[i]
+		var prefix = option_name + "="
+		if param.type == GrogCompiler.TOKEN_RAW and param.content.begins_with(prefix):
+			return param.content.substr(prefix.length())
 	return ""
 
-func get_parameter_as_room_node(params: Array, param_name: String) -> Node:
+func get_option_as_room_node(params: Array, option_name: String) -> Node:
 	if not current_room:
 		return null
 	
-	var node_name = get_parameter(params, param_name)
+	var node_name = get_option(params, option_name)
 	
 	if not node_name:
 		return null

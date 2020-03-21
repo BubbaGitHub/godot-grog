@@ -105,7 +105,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
 			# saves array of optional parameters
 			var optional_params = []
 			for j in range(params.size()):
-				optional_params.append(params[j].content)
+				optional_params.append(params[j])
 			final_params.append(optional_params)
 			
 			statements.append({
