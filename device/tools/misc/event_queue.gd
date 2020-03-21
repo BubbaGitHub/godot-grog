@@ -5,17 +5,18 @@ enum State {
 	Busy
 }
 
-var target
-
 var started = false
 var state = State.Idle
 
+var _target: WeakRef
+
 var _pending_actions = []
 var _routine = null
-var _stopped
+var _stopped: bool
 
 func start(p_target):
-	target = p_target
+	# uses weak reference so the game can be destroyed even if the queue didn't
+	_target = weakref(p_target)
 	
 	started = true
 	_stopped = false
@@ -32,7 +33,7 @@ func grog_update(delta):
 		_routine = _routine.resume(delta)
 		
 		if not _routine:
-			target.event_queue_stopped()
+			_get_target().event_queue_stopped()
 
 func coroutine():
 	state = State.Idle
@@ -50,7 +51,7 @@ func coroutine():
 			var next_action = _pending_actions.pop_front()
 			
 			var params = next_action.params if next_action.has("params") else []
-			var action_result = target.callv(next_action.command, params)
+			var action_result = _get_target().callv(next_action.command, params)
 			
 			if action_result.has("stop") and action_result.stop:
 				return null # stops coroutine
@@ -73,7 +74,7 @@ func coroutine():
 
 func set_ready():
 	state = State.Idle
-	target.event_queue_set_ready()
+	_get_target().event_queue_set_ready()
 
 func set_busy():
 	state = State.Busy
@@ -89,3 +90,8 @@ func push_action(action):
 func push_actions(action_list):
 	for action in action_list:
 		push_action(action)
+
+####################
+
+func _get_target():
+	return _target.get_ref()
