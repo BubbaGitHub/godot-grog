@@ -6,5 +6,16 @@
 resource_name = "test translations"
 script = ExtResource( 1 )
 code_or_filename = ":start
-.say \"Hi\"
-.say \"This script will show dialog translations\""
+
+.load_room room1
+
+.say DEMO_GAME_TRANSLATIONS_INTRO
+
+.load_actor guybrush at=pos1
+.load_actor mark at=pos2
+
+guybrush.say DEMO_GAME_TRANSLATIONS_HI
+mark.say DEMO_GAME_TRANSLATIONS_HI
+guybrush.say DEMO_GAME_TRANSLATIONS_HOW_ARE_YOU
+mark.say DEMO_GAME_TRANSLATIONS_FINE
+"

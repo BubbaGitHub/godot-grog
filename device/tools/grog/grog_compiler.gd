@@ -10,6 +10,8 @@ const routine_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
 
 const command_regex_pattern = "^([a-zA-Z0-9\\-\\_\\ \\#]*).([a-zA-Z0-9\\-\\_\\ \\#]+)$"
 
+const float_regex_pattern = "^\\ *([0-9]+|[0-9]*.[0-9]+)\\ *$"
+
 const TOKEN_RAW = "raw"
 const TOKEN_QUOTED = "quoted"
 
@@ -37,7 +39,7 @@ func compile_text(code: String) -> CompiledGrogScript:
 	
 	return compiled_script
 
-func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
+func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 	var num_lines = lines.size()
 	
 	var i = 0
@@ -51,7 +53,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
 		if not current_line.is_routine_header:
 			# this can only happen at the start of the script
 			compiled_script.add_error("Expecting action header (line %s)" % current_line.line_number)
-			return compiled_script
+			return
 		
 		# reading routine header line
 		
@@ -76,31 +78,49 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
 			
 			if not grog.commands.has(command):
 				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, current_line.line_number])
-				return compiled_script
+				return
 			
 			var command_requirements = grog.commands[command]
 			
 			if subject and not command_requirements.has_subject:
 				compiled_script.add_error("Command '%s' can't has subject (line %s)" % [command, current_line.line_number])
-				return compiled_script
+				return
 			
 			var total = params.size()
 			var required = command_requirements.required_params
+			var num_required = required.size()
 			
-			if total < required:
-				compiled_script.add_error("Command '%s' needs at least %s parameters (line %s)" % [command, required, current_line.line_number])
-				return compiled_script
-			
-			# TODO fine-check parameters
+			if total < num_required:
+				compiled_script.add_error("Command '%s' needs at least %s parameters (line %s)" % [command, num_required, current_line.line_number])
+				return
 			
 			var final_params = []
 			
 			if command_requirements.has_subject:
 				final_params.append(subject)
 			
-			# saves required parameters
-			for _j in range(required):
-				final_params.append(params.pop_front().content)
+			# checks and pushes required parameters and removes them rom params list
+			for j in range(num_required):
+				var param_token = params.pop_front() # removes first param
+				
+				var param
+				
+				match required[j]:
+					grog.ParameterType.StringType:
+						param = param_token.content
+					grog.ParameterType.StringTokenType:
+						param = param_token
+					grog.ParameterType.FloatType:
+						var float_str = param_token.content
+						if not float_str_is_valid(float_str):
+							compiled_script.add_error("Token '%s' is not a valid float parameter (line %s)" % [float_str, statement_line.line_number])
+							return
+						param = float(param_token.content)
+					_:
+						compiled_script.add_error("Grog error: unexpected parameter type")
+						return 
+				
+				final_params.append(param)
 			
 			# saves array of optional parameters
 			var optional_params = []
@@ -291,6 +311,9 @@ func line_is_valid(raw_line: String) -> bool:
 	
 	return true
 
+func float_str_is_valid(float_str: String) -> bool:
+	return contains_pattern(float_str, float_regex())
+
 func token_str(token: Dictionary) -> String:
 	match token.type:
 		TOKEN_RAW:
@@ -332,6 +355,9 @@ func routine_header_regex():
 
 func command_regex():
 	return regex(command_regex_pattern)
+
+func float_regex():
+	return regex(float_regex_pattern)
 
 func regex(pattern):
 	var ret = RegEx.new()

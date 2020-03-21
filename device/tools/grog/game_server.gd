@@ -155,14 +155,18 @@ func load_actor(actor_name: String, params = []):
 	
 	return empty_action
 
-func wait(time_param: String, _params = []):
-	var delay_seconds = float(time_param)
-	
+func wait(delay_seconds: float, _params = []):
 	server_event("wait_started", [delay_seconds])
 	
 	return { block = true, routine = _wait_routine(delay_seconds) }
 
-func say(item_name: String, speech: String, _params = []):
+func say(item_name: String, speech_token: Dictionary, _params = []):
+	var speech: String
+	if speech_token.type == GrogCompiler.TOKEN_QUOTED:
+		speech = speech_token.content
+	else:
+		speech = tr(speech_token.content)
+	
 	var item = null
 	if item_name:
 		item = get_item_named(item_name)

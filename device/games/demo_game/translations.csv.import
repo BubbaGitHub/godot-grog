@@ -1,0 +1,16 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+
+[deps]
+
+files=[ "res://games/demo_game/translations.en.translation", "res://games/demo_game/translations.es.translation" ]
+
+source_file="res://games/demo_game/translations.csv"
+dest_files=[ "res://games/demo_game/translations.en.translation", "res://games/demo_game/translations.es.translation" ]
+
+[params]
+
+compress=true
+delimiter=2
