@@ -16,7 +16,9 @@ const TOKEN_QUOTED = "quoted"
 #	@PUBLIC
 
 func compile(script: Resource) -> CompiledGrogScript:
-	var code = script.get_code()
+	return compile_text(script.get_code())
+
+func compile_text(code: String) -> CompiledGrogScript:
 	var raw_lines: Array = code.split("\n")
 	
 	var compiled_script = CompiledGrogScript.new()

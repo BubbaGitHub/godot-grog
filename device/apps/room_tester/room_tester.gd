@@ -9,12 +9,16 @@ export (NodePath) var room_list_path
 export (NodePath) var actor_list_path
 export (NodePath) var script_list_path
 
+export (NodePath) var raw_script_edit_path
+
 onready var _ui = get_node(ui_path)
 onready var _display = get_node(display_path)
 
 onready var _room_list = get_node(room_list_path)
 onready var _actor_list = get_node(actor_list_path)
 onready var _script_list = get_node(script_list_path)
+
+onready var _raw_script_edit = get_node(raw_script_edit_path)
 
 var _grog_game = null
 
@@ -69,6 +73,11 @@ func _on_test_room_button_pressed():
 func _on_play_game_button_pressed():
 	play_game()
 	
+func _on_test_raw_button_pressed():
+	var script_text = _raw_script_edit.text
+	
+	play_game(GameServer.StartMode.FromRawScript, script_text)
+	
 func _on_quit_button_pressed():
 	get_tree().quit()
 	
@@ -85,15 +94,14 @@ func test_room(_room_resource, _actor_resource):
 
 
 func play_game(game_mode = GameServer.StartMode.Default, param = null):
-	_ui.hide()
-	_display.show()
-	
 	_grog_game = GameServer.new()  
 	
-	_grog_game.init_game(game_to_load, game_mode, param)
+	var is_valid = _grog_game.init_game(game_to_load, game_mode, param)
 	
-	_grog_game.connect("game_server_event", _display, "on_server_event")
+	if is_valid:
+		_ui.hide()
+		_display.show()
 	
-	_display.init(_grog_game)
+		_grog_game.connect("game_server_event", _display, "on_server_event")
+		_display.init(_grog_game)
 	
-

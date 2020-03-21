@@ -36,6 +36,9 @@ func _enter_tree():
 func compile(script: Resource) -> Object:
 	return get_compiler().compile(script)
 
+func compile_text(code: String) -> Object:
+	return get_compiler().compile_text(code)
+	
 func get_compiler():
 	return GrogCompiler.new()
 	

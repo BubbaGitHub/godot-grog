@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://games/demo_game/demo_game.tres" type="Resource" id=1]
 [ext_resource path="res://tools/ui_tools/label.gd" type="Script" id=2]
@@ -14,6 +14,10 @@ font_data = ExtResource( 6 )
 [sub_resource type="Theme" id=2]
 default_font = SubResource( 1 )
 
+[sub_resource type="DynamicFont" id=3]
+size = 18
+font_data = ExtResource( 6 )
+
 [node name="room_tester" type="Node"]
 script = ExtResource( 3 )
 game_to_load = ExtResource( 1 )
@@ -22,6 +26,7 @@ display_path = NodePath("display")
 room_list_path = NodePath("ui_layer/ui/test_rooms/lists/room_list")
 actor_list_path = NodePath("ui_layer/ui/test_rooms/lists/actor_list")
 script_list_path = NodePath("ui_layer/ui/test_rooms/lists/script_list")
+raw_script_edit_path = NodePath("ui_layer/ui/test_raw/raw_script")
 
 [node name="ui_layer" type="CanvasLayer" parent="."]
 layer = 2
@@ -140,17 +145,57 @@ margin_left = -198.508
 margin_top = -146.795
 margin_right = 200.492
 margin_bottom = -31.7958
-text = "ROOM_TESTER_TEST_ROOM"
+text = "ROOM_TESTER_TEST"
 script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="test_raw" type="Panel" parent="ui_layer/ui"]
+margin_left = 119.0
+margin_top = 328.0
+margin_right = 515.0
+margin_bottom = 806.0
+
+[node name="raw_script" type="TextEdit" parent="ui_layer/ui/test_raw"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -118.0
+custom_fonts/font = SubResource( 3 )
+text = "# grog script
+
+:start
+
+.say \"Hello world\"
+
+#.load_room room_name
+#.load_actor actor_name
+#.load_actor actor_name at=pos"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="test_raw_button" type="Button" parent="ui_layer/ui/test_raw"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -120.0
+margin_top = -84.9279
+margin_right = 120.0
+margin_bottom = -17.9279
+text = "ROOM_TESTER_TEST_RAW"
+script = ExtResource( 2 )
 
 [node name="display" parent="." instance=ExtResource( 4 )]
 visible = false
 [connection signal="pressed" from="ui_layer/ui/play_game_button" to="." method="_on_play_game_button_pressed"]
 [connection signal="pressed" from="ui_layer/ui/quit_button" to="." method="_on_quit_button_pressed"]
 [connection signal="pressed" from="ui_layer/ui/test_rooms/test_room_button" to="." method="_on_test_room_button_pressed"]
+[connection signal="pressed" from="ui_layer/ui/test_raw/test_raw_button" to="." method="_on_test_raw_button_pressed"]
 
 [editable path="ui_layer/ui/test_rooms/lists/room_list"]
 

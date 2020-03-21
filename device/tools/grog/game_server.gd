@@ -16,6 +16,7 @@ var event_queue : EventQueue = EventQueue.new()
 
 enum StartMode {
 	Default,
+	FromRawScript,
 	FromScriptResource,
 	FromCompiledScript
 }
@@ -25,11 +26,40 @@ var _game_start_param
 
 const empty_action = { block = false }
 
-func init_game(game_data: Resource, p_game_start_mode = StartMode.Default, p_game_start_param = null):
+func init_game(game_data: Resource, p_game_start_mode = StartMode.Default, p_game_start_param = null) -> bool:
 	data = game_data
 	
 	_game_start_mode = p_game_start_mode
 	_game_start_param = p_game_start_param
+	
+	match p_game_start_mode:
+		StartMode.Default:
+			return true
+		StartMode.FromRawScript:
+			var compiled_script = grog.compile_text(_game_start_param)
+			
+			if compiled_script.is_valid:
+				_game_start_param = compiled_script
+				return true
+			else:
+				print("Script is invalid")
+				
+				compiled_script.print_errors()
+				return false
+		StartMode.FromScriptResource:
+			var compiled_script = grog.compile(_game_start_param)
+			if compiled_script.is_valid:
+				_game_start_param = compiled_script
+				return true
+			else:
+				print("Script is invalid")
+				
+				compiled_script.print_errors()
+				return false
+		StartMode.FromCompiledScript:
+			return _game_start_param.is_valid
+		
+	return false
 
 func start_game(p_root_node: Node):
 	root_node = p_root_node
@@ -52,10 +82,7 @@ func start_game(p_root_node: Node):
 			var script = scripts[0]
 			run_script(script, "start")
 		
-		StartMode.FromScriptResource:
-			run_script(_game_start_param, "start")
-			
-		StartMode.FromCompiledScript:
+		_:
 			run_compiled(_game_start_param, "start")
 
 func set_ready():
@@ -76,10 +103,10 @@ func run_script(script_resource: Resource, routine_name: String):
 	var compiled_script = grog.compile(script_resource)
 	if not compiled_script.is_valid:
 		print("Script is invalid")
-		
+
 		compiled_script.print_errors()
 		return
-	
+
 	run_compiled(compiled_script, routine_name)
 
 func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
