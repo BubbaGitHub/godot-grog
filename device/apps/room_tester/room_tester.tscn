@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://games/demo_game/demo_game.tres" type="Resource" id=1]
 [ext_resource path="res://tools/ui_tools/label.gd" type="Script" id=2]
 [ext_resource path="res://apps/room_tester/room_tester.gd" type="Script" id=3]
 [ext_resource path="res://clients/default_client/game_display.tscn" type="PackedScene" id=4]
+[ext_resource path="res://apps/room_tester/pointfree.ttf" type="DynamicFontData" id=5]
 [ext_resource path="res://apps/room_tester/pixel_intv.otf" type="DynamicFontData" id=6]
 [ext_resource path="res://apps/room_tester/object_list.tscn" type="PackedScene" id=7]
 
@@ -16,7 +17,7 @@ default_font = SubResource( 1 )
 
 [sub_resource type="DynamicFont" id=3]
 size = 18
-font_data = ExtResource( 6 )
+font_data = ExtResource( 5 )
 
 [node name="room_tester" type="Node"]
 script = ExtResource( 3 )
