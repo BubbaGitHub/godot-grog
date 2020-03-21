@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://games/demo_game/demo_game.tres" type="Resource" id=1]
 [ext_resource path="res://tools/ui_tools/label.gd" type="Script" id=2]
@@ -6,8 +6,7 @@
 [ext_resource path="res://clients/default_client/game_display.tscn" type="PackedScene" id=4]
 [ext_resource path="res://tools/ui_tools/object_list.gd" type="Script" id=5]
 [ext_resource path="res://apps/room_tester/pixel_intv.otf" type="DynamicFontData" id=6]
-[ext_resource path="res://apps/room_tester/room_item.tscn" type="PackedScene" id=7]
-[ext_resource path="res://apps/room_tester/actor_item.tscn" type="PackedScene" id=8]
+[ext_resource path="res://apps/room_tester/list_element.tscn" type="PackedScene" id=8]
 
 [sub_resource type="DynamicFont" id=1]
 size = 24
@@ -89,7 +88,7 @@ script = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-item_model = ExtResource( 7 )
+item_model = ExtResource( 8 )
 list_path = NodePath("rooms")
 
 [node name="rooms" type="VBoxContainer" parent="ui_layer/ui/test_rooms/room_list"]

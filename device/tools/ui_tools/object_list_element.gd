@@ -1,5 +1,5 @@
 """
-	Class: ObjectItem
+	Class: ObjectListElement
 	Item of an ObjectList.
 
 	Copyright:
