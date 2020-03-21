@@ -155,3 +155,15 @@ margin_left = 322.0
 margin_top = 136.0
 margin_right = 479.0
 margin_bottom = 200.0
+
+[node name="quit_button" type="Button" parent="command_area"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = 379.308
+margin_top = -126.153
+margin_right = 567.308
+margin_bottom = -51.1528
+text = "Quit"
+[connection signal="pressed" from="command_area/quit_button" to="." method="_on_quit_button_pressed"]

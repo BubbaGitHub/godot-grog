@@ -35,6 +35,8 @@ func _ready():
 	_actor_list.connect("on_element_selected", self, "_on_room_or_actor_selected")
 	_script_list.connect("on_element_selected", self, "_on_script_selected")
 	
+	_display.connect("game_ended", self, "_on_game_ended")
+	
 func list_elements(name: String, elements: Array, list: Node, select_first = true):
 	if not elements:
 		push_error("No list node for %s" % name)
@@ -101,11 +103,6 @@ func play_game(game_mode = GameServer.StartMode.Default, param = null):
 	if is_valid:
 		_ui.hide()
 		_display.show()
-		
-		#warning-ignore:return_value_discarded
-		_grog_game.connect("game_server_end", self, "_on_game_ended")
-		#warning-ignore:return_value_discarded
-		_grog_game.connect("game_server_event", _display, "on_server_event")
 		
 		_display.init(_grog_game)
 	

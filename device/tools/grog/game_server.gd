@@ -2,7 +2,6 @@ class_name GameServer
 
 # server to client signals
 signal game_server_event
-signal game_server_end
 
 var data
 
@@ -90,7 +89,8 @@ func event_queue_set_ready():
 	server_event("set_ready")
 
 func event_queue_stopped():
-	emit_signal("game_server_end")
+	_free_all()
+	server_event("game_ended")
 
 ##############################
 
@@ -203,7 +203,6 @@ func walk(item_name: String, params: Array):
 	return _walk_to(item, target_position)
 	
 func end(_params = []):
-	_free_all()
 	return { stop = true }
 	
 ##############################
@@ -375,6 +374,8 @@ func go_to(target_position: Vector2):
 		params = [current_player, target_position, true]
 	})
 	
+func stop():
+	event_queue.stop_asap()
 
 #### Finding items
 

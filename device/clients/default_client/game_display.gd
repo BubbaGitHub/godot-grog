@@ -1,5 +1,7 @@
 extends Node
 
+signal game_ended
+
 export (NodePath) var room_place_path
 export (NodePath) var controls_place_path
 
@@ -34,9 +36,12 @@ func _ready():
 
 func init(game_server):
 	server = game_server
-	if _room_place:
-		server.start_game(_room_place)
 	
+	#warning-ignore:return_value_discarded
+	server.connect("game_server_event", self, "on_server_event")
+	
+	server.start_game(_room_place)
+
 func _input(event):
 	if not server or not server.is_ready():
 		return
@@ -68,6 +73,11 @@ func on_server_event(event_name, args):
 
 func on_game_started():
 	pass
+
+func on_game_ended():
+	_text_label.clear()
+	_hide_controls()
+	emit_signal("game_ended")
 
 func on_room_loaded(_room):
 	pass
@@ -124,3 +134,7 @@ func _show_controls():
 func _hide_controls():
 	if _controls_place:
 		_controls_place.hide()
+
+func _on_quit_button_pressed():
+	if server:
+		server.stop()

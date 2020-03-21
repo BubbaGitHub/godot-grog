@@ -12,16 +12,21 @@ var state = State.Idle
 
 var _pending_actions = []
 var _routine = null
+var _stopped
 
 func start(p_target):
 	target = p_target
 	
 	started = true
+	_stopped = false
 	
 	_routine = coroutine()
 	
 	var _ret = grog.connect("grog_update", self, "grog_update")
-	
+
+func stop_asap():
+	_stopped = true
+
 func grog_update(delta):
 	if _routine:
 		_routine = _routine.resume(delta)
@@ -33,9 +38,9 @@ func coroutine():
 	state = State.Idle
 	
 	while true:
-		yield()
-		
 		while not _pending_actions:
+			if _stopped:
+				return null
 			yield()
 		
 		# there are pending actions
@@ -44,7 +49,8 @@ func coroutine():
 		while true:
 			var next_action = _pending_actions.pop_front()
 			
-			var action_result = target.callv(next_action.command, next_action.params)
+			var params = next_action.params if next_action.has("params") else []
+			var action_result = target.callv(next_action.command, params)
 			
 			if action_result.has("stop") and action_result.stop:
 				return null # stops coroutine
@@ -54,6 +60,8 @@ func coroutine():
 					var subroutine = action_result.routine
 					
 					while subroutine:
+						if _stopped:
+							return null
 						var delta = yield()
 						subroutine = subroutine.resume(delta)
 				else:
