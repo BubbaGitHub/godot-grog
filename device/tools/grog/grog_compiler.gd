@@ -2,8 +2,9 @@
 class_name GrogCompiler
 
 # Tokenizer patterns
-const line_regex_pattern = "^(\\t)*[a-zA-Z0-9\\.\\:\\-\\_\\'\\?\\=\\ \\#\\\"]*$"
-const token_char_regex_pattern = "[a-zA-Z0-9\\.\\:\\-\\_]"
+
+# any number of tabs followed by any number of spaces and non-whitespaces (anything but tabs)
+const line_regex_pattern = "^(\\t)*(\\S|\\ )*$"
 
 # Compiler patterns
 const routine_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
@@ -213,7 +214,7 @@ enum TokenizerState { WaitingNextToken, WaitingSpace, ReadingToken, ReadingQuote
 func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 	var raw_line = c_line.raw
 	
-	if not line_is_valid(raw_line):
+	if not contains_pattern(raw_line, line_regex()):
 		compiled_script.add_error("Line '%s' is not valid" % c_line.line_number)
 		compiled_script.add_error("%s" % raw_line)
 		
@@ -253,12 +254,9 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 					current_token = { type = TOKEN_QUOTED, content = "" }
 				elif c == "#":
 					break
-				elif contains_pattern(c, token_char_regex()):
+				else:
 					state = TokenizerState.ReadingToken
 					current_token = { type = TOKEN_RAW, content = c }
-				else:
-					compiled_script.add_error("Unexpected char '%s' waiting next token" % c)
-					return []
 					
 			TokenizerState.ReadingToken:
 				if c == " ":
@@ -271,24 +269,18 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 				elif c == "#":
 					compiled_script.add_error("Unexpected '#' inside token")
 					return []
-				elif c == "=" or contains_pattern(c, token_char_regex()):
+				else:
 					# TODO build string efficiently
 					current_token.content += c
-				else:
-					compiled_script.add_error("Unexpected char '%s' reading token" % c)
-					return []
 			
 			TokenizerState.ReadingQuotedToken:
-				if c in " #'?=" or contains_pattern(c, token_char_regex()):
-					# TODO build string efficiently
-					current_token.content += c
-				elif c == "\"":
+				if c == "\"":
 					tokens.append(current_token)
 					current_token = {} # actually unnecessary
 					state = TokenizerState.WaitingSpace
 				else:
-					compiled_script.add_error("Unexpected char '%s' reading quoted token" % c)
-					return []
+					# TODO build string efficiently
+					current_token.content += c
 			
 			TokenizerState.WaitingSpace:
 				if c == " ":
@@ -313,13 +305,6 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 	return tokens
 
 #####################
-
-func line_is_valid(raw_line: String) -> bool:
-	var ret = contains_pattern(raw_line, line_regex())
-	if not ret:
-		return false
-	
-	return true
 
 func float_str_is_valid(float_str: String) -> bool:
 	return contains_pattern(float_str, float_regex())
@@ -354,9 +339,6 @@ func contains_pattern(a_string: String, pattern: RegEx) -> bool:
 	
 	return result != null
 
-func token_char_regex():
-	return regex(token_char_regex_pattern)
-	
 func line_regex():
 	return regex(line_regex_pattern)
 

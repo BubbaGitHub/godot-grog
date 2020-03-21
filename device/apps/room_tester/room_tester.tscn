@@ -170,11 +170,18 @@ text = "# grog script
 
 :start
 
-#.say \"Hello world!\"
+.say \"Hello, world!\"
+
+.end
 
 #.load_room room_name
 #.load_actor actor_name
-#.load_actor actor_name at=pos"
+#.load_actor actor_name at=pos
+
+#.wait 2
+#actor_name.say \"Dialog\"
+#actor_name.walk to=pos
+"
 __meta__ = {
 "_edit_use_anchors_": false
 }
