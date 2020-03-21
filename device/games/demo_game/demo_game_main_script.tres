@@ -2,10 +2,8 @@
 
 [ext_resource path="res://tools/grog/grog_script.gd" type="Script" id=1]
 
-
-
-
 [resource]
+resource_name = "main"
 script = ExtResource( 1 )
 code_or_filename = "
 :start

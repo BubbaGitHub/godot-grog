@@ -1,12 +1,11 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://games/demo_game/demo_game.tres" type="Resource" id=1]
 [ext_resource path="res://tools/ui_tools/label.gd" type="Script" id=2]
 [ext_resource path="res://apps/room_tester/room_tester.gd" type="Script" id=3]
 [ext_resource path="res://clients/default_client/game_display.tscn" type="PackedScene" id=4]
-[ext_resource path="res://tools/ui_tools/object_list.gd" type="Script" id=5]
 [ext_resource path="res://apps/room_tester/pixel_intv.otf" type="DynamicFontData" id=6]
-[ext_resource path="res://apps/room_tester/list_element.tscn" type="PackedScene" id=8]
+[ext_resource path="res://apps/room_tester/object_list.tscn" type="PackedScene" id=7]
 
 [sub_resource type="DynamicFont" id=1]
 size = 24
@@ -20,8 +19,9 @@ script = ExtResource( 3 )
 game_to_load = ExtResource( 1 )
 ui_path = NodePath("ui_layer/ui")
 display_path = NodePath("display")
-room_list_path = NodePath("ui_layer/ui/test_rooms/room_list")
-actor_list_path = NodePath("ui_layer/ui/test_rooms/actor_list")
+room_list_path = NodePath("ui_layer/ui/test_rooms/lists/room_list")
+actor_list_path = NodePath("ui_layer/ui/test_rooms/lists/actor_list")
+script_list_path = NodePath("ui_layer/ui/test_rooms/lists/script_list")
 
 [node name="ui_layer" type="CanvasLayer" parent="."]
 layer = 2
@@ -43,10 +43,10 @@ __meta__ = {
 }
 
 [node name="play_game_button" type="Button" parent="ui_layer/ui"]
-margin_left = 1321.5
-margin_top = 193.655
-margin_right = 1724.5
-margin_bottom = 328.656
+margin_left = 112.756
+margin_top = 81.4145
+margin_right = 515.756
+margin_bottom = 216.416
 text = "ROOM_TESTER_PLAY_GAME"
 script = ExtResource( 2 )
 __meta__ = {
@@ -54,10 +54,10 @@ __meta__ = {
 }
 
 [node name="quit_button" type="Button" parent="ui_layer/ui"]
-margin_left = 1313.71
-margin_top = 600.791
-margin_right = 1716.71
-margin_bottom = 735.792
+margin_left = 109.283
+margin_top = 892.185
+margin_right = 512.283
+margin_bottom = 1027.19
 text = "ROOM_TESTER_QUIT"
 script = ExtResource( 2 )
 __meta__ = {
@@ -65,10 +65,12 @@ __meta__ = {
 }
 
 [node name="test_rooms" type="Panel" parent="ui_layer/ui"]
-margin_left = 170.0
-margin_top = 113.0
-margin_right = 1100.0
-margin_bottom = 889.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 650.0
+margin_top = 50.0
+margin_right = -50.0
+margin_bottom = -50.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -81,86 +83,63 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="room_list" type="Control" parent="ui_layer/ui/test_rooms"]
-anchor_right = 0.333
-anchor_bottom = 0.8
-script = ExtResource( 5 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-item_model = ExtResource( 8 )
-list_path = NodePath("rooms")
-
-[node name="rooms" type="VBoxContainer" parent="ui_layer/ui/test_rooms/room_list"]
+[node name="lists" type="HBoxContainer" parent="ui_layer/ui/test_rooms"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 20.0
-margin_right = -20.0
-margin_bottom = -20.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="header" type="Control" parent="ui_layer/ui/test_rooms/room_list/rooms"]
-margin_right = 269.0
-margin_bottom = 80.0
-rect_min_size = Vector2( 0, 80 )
+[node name="room_list" parent="ui_layer/ui/test_rooms/lists" instance=ExtResource( 7 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 404.0
+margin_bottom = 980.0
 
-[node name="Label" type="Label" parent="ui_layer/ui/test_rooms/room_list/rooms/header"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_colors/font_color = Color( 0.572549, 0.937255, 0.584314, 1 )
+[node name="header" parent="ui_layer/ui/test_rooms/lists/room_list/elements" index="0"]
+margin_right = 364.0
+
+[node name="Label" parent="ui_layer/ui/test_rooms/lists/room_list/elements/header" index="0"]
 text = "ROOM_TESTER_ROOMS"
-valign = 1
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="actor_list" type="Control" parent="ui_layer/ui/test_rooms"]
-anchor_left = 0.333
-anchor_right = 0.667
-anchor_bottom = 0.8
-script = ExtResource( 5 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-item_model = ExtResource( 8 )
-list_path = NodePath("actors")
+[node name="actor_list" parent="ui_layer/ui/test_rooms/lists" instance=ExtResource( 7 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 408.0
+margin_right = 812.0
+margin_bottom = 980.0
 
-[node name="actors" type="VBoxContainer" parent="ui_layer/ui/test_rooms/actor_list"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 20.0
-margin_right = -20.0
-margin_bottom = -20.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="header" parent="ui_layer/ui/test_rooms/lists/actor_list/elements" index="0"]
+margin_right = 364.0
 
-[node name="header" type="Control" parent="ui_layer/ui/test_rooms/actor_list/actors"]
-margin_right = 270.0
-margin_bottom = 80.0
-rect_min_size = Vector2( 0, 80 )
-
-[node name="Label" type="Label" parent="ui_layer/ui/test_rooms/actor_list/actors/header"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_colors/font_color = Color( 0.572549, 0.937255, 0.584314, 1 )
+[node name="Label" parent="ui_layer/ui/test_rooms/lists/actor_list/elements/header" index="0"]
 text = "ROOM_TESTER_ACTORS"
-valign = 1
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="script_list" parent="ui_layer/ui/test_rooms/lists" instance=ExtResource( 7 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 816.0
+margin_right = 1220.0
+margin_bottom = 980.0
+
+[node name="ColorRect" parent="ui_layer/ui/test_rooms/lists/script_list" index="0"]
+color = Color( 0, 0, 0, 0.168627 )
+
+[node name="header" parent="ui_layer/ui/test_rooms/lists/script_list/elements" index="0"]
+margin_right = 364.0
+
+[node name="Label" parent="ui_layer/ui/test_rooms/lists/script_list/elements/header" index="0"]
+text = "ROOM_TESTER_SCRIPTS"
 
 [node name="test_room_button" type="Button" parent="ui_layer/ui/test_rooms"]
-margin_left = 275.512
-margin_top = 621.522
-margin_right = 674.512
-margin_bottom = 736.521
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -198.508
+margin_top = -146.795
+margin_right = 200.492
+margin_bottom = -31.7958
 text = "ROOM_TESTER_TEST_ROOM"
 script = ExtResource( 2 )
 __meta__ = {
@@ -172,3 +151,9 @@ visible = false
 [connection signal="pressed" from="ui_layer/ui/play_game_button" to="." method="_on_play_game_button_pressed"]
 [connection signal="pressed" from="ui_layer/ui/quit_button" to="." method="_on_quit_button_pressed"]
 [connection signal="pressed" from="ui_layer/ui/test_rooms/test_room_button" to="." method="_on_test_room_button_pressed"]
+
+[editable path="ui_layer/ui/test_rooms/lists/room_list"]
+
+[editable path="ui_layer/ui/test_rooms/lists/actor_list"]
+
+[editable path="ui_layer/ui/test_rooms/lists/script_list"]

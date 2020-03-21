@@ -1,13 +1,13 @@
 """
 	Class: ObjectListElement
-	Item of an ObjectList.
+	Element of an ObjectList.
 
 	Copyright:
 	Copyright 2020, jluini
 """
 extends "view.gd"
 
-signal item_toggled
+signal element_toggled
 
 export (NodePath) var label_path
 
@@ -33,4 +33,4 @@ func uncheck():
 	$check.pressed = false
 	
 func _on_check_toggled(toggle_value):
-	emit_signal("item_toggled", self, toggle_value)
+	emit_signal("element_toggled", self, toggle_value)

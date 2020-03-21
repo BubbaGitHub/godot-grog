@@ -16,7 +16,7 @@ var event_queue : EventQueue = EventQueue.new()
 
 enum StartMode {
 	Default,
-	FromScript,
+	FromScriptResource,
 	FromCompiledScript
 }
 
@@ -52,6 +52,9 @@ func start_game(p_root_node: Node):
 			var script = scripts[0]
 			run_script(script, "start")
 		
+		StartMode.FromScriptResource:
+			run_script(_game_start_param, "start")
+			
 		StartMode.FromCompiledScript:
 			run_compiled(_game_start_param, "start")
 
