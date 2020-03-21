@@ -5,7 +5,7 @@
 	Copyright:
 	Copyright 2020, jluini
 """
-extends "res://source/view.gd"
+extends "view.gd"
 
 signal item_toggled
 
