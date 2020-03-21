@@ -8,9 +8,9 @@ const token_char_regex_pattern = "[a-zA-Z0-9\\.\\:\\-\\_]"
 # Compiler patterns
 const routine_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
 
-const command_regex_pattern = "^([a-zA-Z0-9\\-\\_\\ \\#]*).([a-zA-Z0-9\\-\\_\\ \\#]+)$"
+const command_regex_pattern = "^([a-zA-Z0-9\\-\\_\\ \\#]*)\\.([a-zA-Z0-9\\-\\_\\ \\#]+)$"
 
-const float_regex_pattern = "^\\ *([0-9]+|[0-9]*.[0-9]+)\\ *$"
+const float_regex_pattern = "^\\ *([0-9]+|[0-9]*\\.[0-9]+)\\ *$"
 
 const TOKEN_RAW = "raw"
 const TOKEN_QUOTED = "quoted"
@@ -69,12 +69,12 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 			
 			# reading command line
 			
-			var statement_line = lines[i]
+			current_line = lines[i]
 			i += 1
 			
-			var subject: String = statement_line.subject
-			var command: String = statement_line.command
-			var params: Array = statement_line.params
+			var subject: String = current_line.subject
+			var command: String = current_line.command
+			var params: Array = current_line.params
 			
 			if not grog.commands.has(command):
 				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, current_line.line_number])
@@ -113,7 +113,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 					grog.ParameterType.FloatType:
 						var float_str = param_token.content
 						if not float_str_is_valid(float_str):
-							compiled_script.add_error("Token '%s' is not a valid float parameter (line %s)" % [float_str, statement_line.line_number])
+							compiled_script.add_error("Token '%s' is not a valid float parameter (line %s)" % [float_str, current_line.line_number])
 							return
 						param = float(param_token.content)
 					_:
@@ -152,7 +152,7 @@ func identify_line(compiled_script: CompiledGrogScript, line: Dictionary) -> voi
 		compiled_script.add_error("Invalid first token %s (line %s)" % [token_str(first_token), line.line_number])
 		return
 	
-	var first_content = first_token.content
+	var first_content: String = first_token.content
 	
 	if first_content.begins_with(":"):
 		# it's a routine header
@@ -171,14 +171,24 @@ func identify_line(compiled_script: CompiledGrogScript, line: Dictionary) -> voi
 		var result = command_regex().search(first_content)
 		if not result:
 			compiled_script.add_error("Command '%s' is not valid (line %s)" % [first_content, line.line_number])
+			
+			if first_content.find(".") == -1:
+				if grog.commands.has(first_content):
+					compiled_script.add_error("Did you mean .%s?" % first_content)
+				else:
+					compiled_script.add_error("Did you forget the leading dot?")
+				
 			return
-		
+			
 		# TODO do a basic check over parameters?
+		
+		var params: Array = line.tokens
+		params.pop_front()
 		
 		line.is_routine_header = false
 		line.subject = result.strings[1]
 		line.command = result.strings[2]
-		line.params = line.tokens.slice(1, line.tokens.size() - 1)
+		line.params = params
 	
 func tokenize_lines(compiled_script: CompiledGrogScript, raw_lines: Array) -> Array:
 	var ret = []

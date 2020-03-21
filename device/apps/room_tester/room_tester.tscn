@@ -170,7 +170,7 @@ text = "# grog script
 
 :start
 
-.say \"Hello world\"
+#.say \"Hello world!\"
 
 #.load_room room_name
 #.load_actor actor_name

@@ -20,7 +20,7 @@ onready var _script_list = get_node(script_list_path)
 
 onready var _raw_script_edit = get_node(raw_script_edit_path)
 
-var _grog_game = null
+var _grog_game: GameServer = null
 
 func _ready():
 	if not game_to_load:
@@ -101,7 +101,15 @@ func play_game(game_mode = GameServer.StartMode.Default, param = null):
 	if is_valid:
 		_ui.hide()
 		_display.show()
-	
+		
+		#warning-ignore:return_value_discarded
+		_grog_game.connect("game_server_end", self, "_on_game_ended")
+		#warning-ignore:return_value_discarded
 		_grog_game.connect("game_server_event", _display, "on_server_event")
+		
 		_display.init(_grog_game)
 	
+func _on_game_ended():
+	_grog_game = null
+	_display.hide()
+	_ui.show()

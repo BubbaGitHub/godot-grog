@@ -42,6 +42,10 @@ var commands = {
 		has_subject = true,
 		required_params = []
 		# TODO required option 'at'
+	},
+	end = {
+		has_subject = false,
+		required_params = []
 	}
 }
 
@@ -50,10 +54,10 @@ var commands = {
 func _enter_tree():
 	tree = get_tree()
 
-func compile(script: Resource) -> Object:
+func compile(script: Resource) -> CompiledGrogScript:
 	return get_compiler().compile(script)
 
-func compile_text(code: String) -> Object:
+func compile_text(code: String) -> CompiledGrogScript:
 	return get_compiler().compile_text(code)
 	
 func get_compiler():

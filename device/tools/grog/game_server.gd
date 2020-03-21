@@ -2,6 +2,7 @@ class_name GameServer
 
 # server to client signals
 signal game_server_event
+signal game_server_end
 
 var data
 
@@ -85,8 +86,11 @@ func start_game(p_root_node: Node):
 		_:
 			run_compiled(_game_start_param, "start")
 
-func set_ready():
+func event_queue_set_ready():
 	server_event("set_ready")
+
+func event_queue_stopped():
+	emit_signal("game_server_end")
 
 ##############################
 
@@ -198,6 +202,9 @@ func walk(item_name: String, params: Array):
 	
 	return _walk_to(item, target_position)
 	
+func end(_params = []):
+	_free_all()
+	return { stop = true }
 	
 ##############################
 
@@ -243,16 +250,7 @@ func _load_room(room_name: String) -> Node:
 		push_error("Couldn't load room '%s'"  % room_name)
 		return null
 	
-	if current_player:
-		current_room.remove_child(current_player)
-		current_player.queue_free()
-		current_player = null
-	
-	if current_room:
-		root_node.remove_child(current_room)
-		current_room.queue_free()
-	
-	# TODO also free another actors and items
+	_free_all()
 	
 	current_room = room
 	
@@ -341,6 +339,19 @@ func _walk_routine(item, path: PoolVector2Array):
 		path.remove(0)
 	
 	item.emit_signal("stop_walking")
+
+func _free_all():
+	if current_player:
+		current_room.remove_child(current_player)
+		current_player.queue_free()
+		current_player = null
+	
+	if current_room:
+		root_node.remove_child(current_room)
+		current_room.queue_free()
+		current_room = null
+	
+	# TODO also free another actors and items
 	
 ##############################
 

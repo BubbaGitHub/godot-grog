@@ -25,6 +25,9 @@ func start(p_target):
 func grog_update(delta):
 	if _routine:
 		_routine = _routine.resume(delta)
+		
+		if not _routine:
+			target.event_queue_stopped()
 
 func coroutine():
 	state = State.Idle
@@ -43,7 +46,10 @@ func coroutine():
 			
 			var action_result = target.callv(next_action.command, next_action.params)
 			
-			if action_result.block:
+			if action_result.has("stop") and action_result.stop:
+				return null # stops coroutine
+			
+			elif action_result.block:
 				if action_result.has("routine"):
 					var subroutine = action_result.routine
 					
@@ -59,7 +65,7 @@ func coroutine():
 
 func set_ready():
 	state = State.Idle
-	target.set_ready()
+	target.event_queue_set_ready()
 
 func set_busy():
 	state = State.Busy
