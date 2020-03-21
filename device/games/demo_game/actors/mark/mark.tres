@@ -3,9 +3,6 @@
 [ext_resource path="res://tools/grog/actor_resource.gd" type="Script" id=1]
 [ext_resource path="res://games/demo_game/actors/mark/mark.tscn" type="PackedScene" id=2]
 
-
-
-
 [resource]
 resource_name = "mark"
 script = ExtResource( 1 )

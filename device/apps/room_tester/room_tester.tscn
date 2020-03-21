@@ -9,8 +9,6 @@
 [ext_resource path="res://apps/room_tester/room_item.tscn" type="PackedScene" id=7]
 [ext_resource path="res://apps/room_tester/actor_item.tscn" type="PackedScene" id=8]
 
-
-
 [sub_resource type="DynamicFont" id=1]
 size = 24
 font_data = ExtResource( 6 )

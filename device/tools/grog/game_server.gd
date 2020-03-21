@@ -72,7 +72,7 @@ func run_script_named(script_name: String, routine_name: String):
 func run_script(script_resource: Resource, routine_name: String):
 	var compiled_script = grog.compile(script_resource)
 	if not compiled_script.is_valid:
-		print("Script '%s' is invalid")
+		print("Script is invalid")
 		
 		compiled_script.print_errors()
 		return

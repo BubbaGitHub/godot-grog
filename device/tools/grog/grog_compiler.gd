@@ -6,9 +6,12 @@ const line_regex_pattern = "^(\\t)*[a-zA-Z0-9\\.\\:\\-\\_\\'\\?\\=\\ \\#\\\"]*$"
 const token_char_regex_pattern = "[a-zA-Z0-9\\.\\:\\-\\_]"
 
 # Compiler patterns
-const token_regex_pattern = "^\\:?([a-zA-Z0-9\\.\\-\\_\\'\\?\\=\\ \\#]+)$"
+const routine_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
 
 const command_regex_pattern = "^([a-zA-Z0-9\\-\\_\\ \\#]*).([a-zA-Z0-9\\-\\_\\ \\#]+)$"
+
+const TOKEN_RAW = "raw"
+const TOKEN_QUOTED = "quoted"
 
 #	@PUBLIC
 
@@ -43,27 +46,31 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
 		
 		# expecting actions like ":pick_up" or ":start"
 		
-		if not current_line.is_action_header:
+		if not current_line.is_routine_header:
 			# this can only happen at the start of the script
 			compiled_script.add_error("Expecting action header (line %s)" % current_line.line_number)
 			return compiled_script
 		
-		var action_name = current_line.action_name
+		# reading routine header line
+		
+		var routine_name = current_line.routine_name
 		
 		var statements = []
 		
 		while true:
-			var more_statements = i < num_lines and not lines[i].is_action_header
+			var more_statements = i < num_lines and not lines[i].is_routine_header
 			
 			if not more_statements:
 				break
 			
+			# reading command line
+			
 			var statement_line = lines[i]
 			i += 1
 			
-			var subject = statement_line.subject
-			var command = statement_line.command
-			var params = statement_line.tokens.slice(1, statement_line.tokens.size() - 1)
+			var subject: String = statement_line.subject
+			var command: String = statement_line.command
+			var params: Array = statement_line.params
 			
 			if not grog.commands.has(command):
 				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, current_line.line_number])
@@ -82,61 +89,74 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array):
 				compiled_script.add_error("Command '%s' needs at least %s parameters (line %s)" % [command, required, current_line.line_number])
 				return compiled_script
 			
+			# TODO fine-check parameters
+			
 			var final_params = []
 			
 			if command_requirements.has_subject:
 				final_params.append(subject)
 			
 			# saves required parameters
-			for _j in range(0, required):
-				final_params.append(params.pop_front())
+			for _j in range(required):
+				final_params.append(params.pop_front().content)
 			
 			# saves array of optional parameters
-			final_params.append(params)
+			var optional_params = []
+			for j in range(params.size()):
+				optional_params.append(params[j].content)
+			final_params.append(optional_params)
 			
 			statements.append({
 				command = command,
 				params = final_params
 			})
 		
-		compiled_script.add_routine(action_name, statements)
+		compiled_script.add_routine(routine_name, statements)
 		
 	#return compiled_script
 
 func identify_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 	for i in range(lines.size()):
-		var line = lines[i]
+		identify_line(compiled_script, lines[i])
+
+func identify_line(compiled_script: CompiledGrogScript, line: Dictionary) -> void:
+	if line.indent_level != 0:
+		compiled_script.add_error("Indentation levels not implemented (line %s)" % line.line_number)
+		return
+	
+	var first_token: Dictionary = line.tokens[0]
+	
+	if first_token.type != TOKEN_RAW:
+		compiled_script.add_error("Invalid first token %s (line %s)" % [token_str(first_token), line.line_number])
+		return
+	
+	var first_content = first_token.content
+	
+	if first_content.begins_with(":"):
+		# it's a routine header
+		var result = routine_header_regex().search(first_content)
+		if not result:
+			compiled_script.add_error("Routine name '%s' is not valid (line %s)" % [first_content, line.line_number])
+			return
 		
-		if line.indent_level != 0:
-			compiled_script.add_error("Indentation levels not implemented (line %s)" % line.line_number)
-			line.valid = false
+		# TODO check routine headers parameters or additional tokens (if any)
 		
-		for j in range(line.tokens.size()):
-			var token = line.tokens[j]
-			
-			if not token_is_valid(token):
-				compiled_script.add_error("Invalid token '%s' (line %s token %s)" % [token, line.line_number, j])
-				line.valid = false
-			
-			else:
-				if j == 0:
-					var is_action = token[0] == ":"
-					
-					if is_action:
-						line.is_action_header = true
-						line.action_name = token.substr(1)
-					else:
-						line.is_action_header = false
-						
-						var result = command_regex().search(token)
-						
-						if not result:
-							compiled_script.add_error("Invalid command '%s' (line %s token %s)" % [token, line.line_number, j])
-							line.valid = false
-						
-						line.subject = result.strings[1]
-						line.command = result.strings[2]
-				
+		line.is_routine_header = true
+		line.routine_name = result.strings[1]
+		
+	else:
+		# it's a command
+		var result = command_regex().search(first_content)
+		if not result:
+			compiled_script.add_error("Command '%s' is not valid (line %s)" % [first_content, line.line_number])
+			return
+		
+		# TODO do a basic check over parameters?
+		
+		line.is_routine_header = false
+		line.subject = result.strings[1]
+		line.command = result.strings[2]
+		line.params = line.tokens.slice(1, line.tokens.size() - 1)
 	
 func tokenize_lines(compiled_script: CompiledGrogScript, raw_lines: Array) -> Array:
 	var ret = []
@@ -158,38 +178,35 @@ func tokenize_lines(compiled_script: CompiledGrogScript, raw_lines: Array) -> Ar
 
 enum TokenizerState { WaitingNextToken, WaitingSpace, ReadingToken, ReadingQuotedToken }
 
-func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void: #Dictionary:
+func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 	var raw_line = c_line.raw
 	
 	if not line_is_valid(raw_line):
 		compiled_script.add_error("Line '%s' is not valid" % c_line.line_number)
-		compiled_script.add_error("'%s'" % raw_line)
-		c_line.valid = false
+		compiled_script.add_error("%s" % raw_line)
+		
 		return
 	
 	var indent_level = number_of_leading_tabs(raw_line)
-	var line = raw_line.substr(indent_level)
+	var line_content = raw_line.substr(indent_level)
 	
-	var tokens = get_tokens(compiled_script, line)
+	var tokens = get_tokens(compiled_script, line_content)
 	
 	if not compiled_script.is_valid:
 		# Invalid line
-		c_line.valid = false
 		return
 	
-	c_line.valid = true
 	c_line.blank = tokens.size() == 0
 	
 	if not c_line.blank:
 		c_line.indent_level = indent_level
 		c_line.tokens = tokens
 		
-
 	
-func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # or null (TODO should be a class)
+func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 	var tokens = []
 	
-	var current_token = ""
+	var current_token: Dictionary
 	var state = TokenizerState.WaitingNextToken
 	
 	for i in range(line.length()):
@@ -201,12 +218,12 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 					pass
 				elif c == "\"":
 					state = TokenizerState.ReadingQuotedToken
-					current_token = ""
+					current_token = { type = TOKEN_QUOTED, content = "" }
 				elif c == "#":
 					break
 				elif contains_pattern(c, token_char_regex()):
 					state = TokenizerState.ReadingToken
-					current_token = c
+					current_token = { type = TOKEN_RAW, content = c }
 				else:
 					compiled_script.add_error("Unexpected char '%s' waiting next token" % c)
 					return []
@@ -214,7 +231,7 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 			TokenizerState.ReadingToken:
 				if c == " ":
 					tokens.append(current_token)
-					current_token = ""
+					current_token = {} # actually unnecessary
 					state = TokenizerState.WaitingNextToken
 				elif c == "\"":
 					compiled_script.add_error("Unexpected quote inside token")
@@ -224,7 +241,7 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 					return []
 				elif c == "=" or contains_pattern(c, token_char_regex()):
 					# TODO build string efficiently
-					current_token = current_token + c
+					current_token.content += c
 				else:
 					compiled_script.add_error("Unexpected char '%s' reading token" % c)
 					return []
@@ -232,10 +249,10 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 			TokenizerState.ReadingQuotedToken:
 				if c in " #'?=" or contains_pattern(c, token_char_regex()):
 					# TODO build string efficiently
-					current_token = current_token + c
+					current_token.content += c
 				elif c == "\"":
 					tokens.append(current_token)
-					current_token = ""
+					current_token = {} # actually unnecessary
 					state = TokenizerState.WaitingSpace
 				else:
 					compiled_script.add_error("Unexpected char '%s' reading quoted token" % c)
@@ -256,6 +273,7 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array: # o
 	match state:
 		TokenizerState.ReadingToken:
 			tokens.append(current_token)
+			current_token = {} # actually unnecessary
 		TokenizerState.ReadingQuotedToken:
 			compiled_script.add_error("Unexpected end of line while reading quoted token")
 			return []
@@ -271,8 +289,15 @@ func line_is_valid(raw_line: String) -> bool:
 	
 	return true
 
-func token_is_valid(token: String) -> bool:
-	return contains_pattern(token, token_regex())
+func token_str(token: Dictionary) -> String:
+	match token.type:
+		TOKEN_RAW:
+			return token.content
+		TOKEN_QUOTED:
+			return "\"\"\"%s\"\"\"" % token.content
+		_:
+			push_error("Unexpected type %s" % token.type)
+			return token.content
 
 func number_of_leading_tabs(raw_line: String) -> int:
 	var ret = 0
@@ -300,8 +325,8 @@ func token_char_regex():
 func line_regex():
 	return regex(line_regex_pattern)
 
-func token_regex():
-	return regex(token_regex_pattern)
+func routine_header_regex():
+	return regex(routine_header_regex_pattern)
 
 func command_regex():
 	return regex(command_regex_pattern)
