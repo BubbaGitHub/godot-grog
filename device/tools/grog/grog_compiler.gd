@@ -209,8 +209,6 @@ func tokenize_lines(compiled_script: CompiledGrogScript, raw_lines: Array) -> Ar
 	
 	return ret
 
-enum TokenizerState { WaitingNextToken, WaitingSpace, ReadingToken, ReadingQuotedToken }
-
 func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 	var raw_line = c_line.raw
 	
@@ -223,7 +221,7 @@ func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 	var indent_level = number_of_leading_tabs(raw_line)
 	var line_content = raw_line.substr(indent_level)
 	
-	var tokens = get_tokens(compiled_script, line_content)
+	var tokens = get_tokens(compiled_script, line_content, c_line.line_number)
 	
 	if not compiled_script.is_valid:
 		# Invalid line
@@ -235,8 +233,17 @@ func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 		c_line.indent_level = indent_level
 		c_line.tokens = tokens
 		
-	
-func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
+
+enum TokenizerState {
+	WaitingNextToken,
+	WaitingSpace,
+	ReadingToken,
+	ReadingQuotedToken,
+	ReadingEscapeSequence
+}
+
+# TODO build strings efficiently
+func get_tokens(compiled_script: CompiledGrogScript, line: String, line_number: int) -> Array:
 	var tokens = []
 	
 	var current_token: Dictionary
@@ -264,13 +271,12 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 					current_token = {} # actually unnecessary
 					state = TokenizerState.WaitingNextToken
 				elif c == "\"":
-					compiled_script.add_error("Unexpected quote inside token")
+					compiled_script.add_error("Unexpected quote inside token (line %s)" % line_number)
 					return []
 				elif c == "#":
-					compiled_script.add_error("Unexpected '#' inside token")
+					compiled_script.add_error("Unexpected '#' inside token (line %s)" % line_number)
 					return []
 				else:
-					# TODO build string efficiently
 					current_token.content += c
 			
 			TokenizerState.ReadingQuotedToken:
@@ -278,17 +284,26 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 					tokens.append(current_token)
 					current_token = {} # actually unnecessary
 					state = TokenizerState.WaitingSpace
+				elif c == "\\":
+					state = TokenizerState.ReadingEscapeSequence
 				else:
-					# TODO build string efficiently
 					current_token.content += c
 			
+			TokenizerState.ReadingEscapeSequence:
+				if not c in ["\\", "\""]:
+					compiled_script.add_error("Invalid escape sequence (line %s)" % line_number)
+					return []
+				
+				current_token.content += c # escaped character in quote
+				state = TokenizerState.ReadingQuotedToken
+				
 			TokenizerState.WaitingSpace:
 				if c == " ":
 					state = TokenizerState.WaitingNextToken
 				elif c == "#":
 					break
 				else:
-					compiled_script.add_error("Unexpected char '%s' after closing quote" % c)
+					compiled_script.add_error("Unexpected char '%s' after closing quote (line %s)" % [c, line_number])
 					return []
 			_:
 				push_error("Unexpected state %s" % state)
@@ -298,8 +313,8 @@ func get_tokens(compiled_script: CompiledGrogScript, line: String) -> Array:
 		TokenizerState.ReadingToken:
 			tokens.append(current_token)
 			current_token = {} # actually unnecessary
-		TokenizerState.ReadingQuotedToken:
-			compiled_script.add_error("Unexpected end of line while reading quoted token")
+		TokenizerState.ReadingQuotedToken, TokenizerState.ReadingEscapeSequence:
+			compiled_script.add_error("Unexpected end of line while reading quoted token (line %s)" % line_number)
 			return []
 		
 	return tokens
