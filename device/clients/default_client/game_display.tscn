@@ -1,17 +1,17 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://clients/default_client/pixel_intv.otf" type="DynamicFontData" id=1]
-[ext_resource path="res://clients/default_client/game_display.gd" type="Script" id=2]
+[ext_resource path="res://clients/default_client/game_display.gd" type="Script" id=1]
+[ext_resource path="res://clients/default_client/pixel_intv.otf" type="DynamicFontData" id=2]
 [ext_resource path="res://clients/default_client/action.tscn" type="PackedScene" id=3]
 
 [sub_resource type="DynamicFont" id=1]
 size = 32
-font_data = ExtResource( 1 )
+font_data = ExtResource( 2 )
 
-[node name="display" type="Control"]
+[node name="game_display" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 2 )
+script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

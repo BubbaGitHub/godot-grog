@@ -3,11 +3,12 @@
 [ext_resource path="res://games/demo_game/demo_game.tres" type="Resource" id=1]
 [ext_resource path="res://tools/ui_tools/label.gd" type="Script" id=2]
 [ext_resource path="res://apps/room_tester/room_tester.gd" type="Script" id=3]
-[ext_resource path="res://clients/default_client/display.tscn" type="PackedScene" id=4]
+[ext_resource path="res://clients/default_client/game_display.tscn" type="PackedScene" id=4]
 [ext_resource path="res://tools/ui_tools/object_list.gd" type="Script" id=5]
 [ext_resource path="res://apps/room_tester/pixel_intv.otf" type="DynamicFontData" id=6]
 [ext_resource path="res://apps/room_tester/room_item.tscn" type="PackedScene" id=7]
 [ext_resource path="res://apps/room_tester/actor_item.tscn" type="PackedScene" id=8]
+
 
 
 [sub_resource type="DynamicFont" id=1]
