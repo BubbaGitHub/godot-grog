@@ -46,20 +46,21 @@ func _input(event):
 	if not server or not server.is_ready():
 		return
 	
-	if event is InputEventMouseButton: 
-		if event.pressed:
-			if input_state == InputState.Nothing:
-				input_state = InputState.DoingLeftClick
-				input_position = event.position
-		else:
-			if input_state == InputState.DoingLeftClick:
-				# TODO give it some threshold!
-				# currently only exact clicks work
-				
-				if event.position == input_position:
-					_left_click(input_position)
-				
-				input_state = InputState.Nothing
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_LEFT:
+			if event.pressed:
+				if input_state == InputState.Nothing:
+					input_state = InputState.DoingLeftClick
+					input_position = event.position
+			else:
+				if input_state == InputState.DoingLeftClick:
+					# TODO give it some threshold!
+					# currently only exact clicks work
+					
+					if event.position == input_position:
+						_left_click(input_position)
+					
+					input_state = InputState.Nothing
 
 func on_server_event(event_name, args):
 	var handler_name = "on_" + event_name
