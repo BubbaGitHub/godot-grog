@@ -2,7 +2,7 @@ id	en	es
 ROOM_TESTER_ROOMS	rooms	habitaciones
 ROOM_TESTER_ACTORS	actors	actores
 ROOM_TESTER_SCRIPTS	scripts	guiones
-ROOM_TESTER_TEST	test	probar
-ROOM_TESTER_TEST_RAW	test script	probar script
+ROOM_TESTER_TEST_ROOM	test room	probar habitación
+ROOM_TESTER_TEST_SCRIPT	test script	probar guión
 ROOM_TESTER_PLAY_GAME	play game	iniciar juego
 ROOM_TESTER_QUIT	quit	salir

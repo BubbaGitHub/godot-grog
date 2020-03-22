@@ -11,6 +11,8 @@ export (NodePath) var script_list_path
 
 export (NodePath) var raw_script_edit_path
 
+var _grog_game: GameServer = null
+
 onready var _ui = get_node(ui_path)
 onready var _display = get_node(display_path)
 
@@ -20,20 +22,21 @@ onready var _script_list = get_node(script_list_path)
 
 onready var _raw_script_edit = get_node(raw_script_edit_path)
 
-var _grog_game: GameServer = null
+var _default_script
 
 func _ready():
 	if not game_to_load:
 		push_error("No game_to_load")
 		return
 	
+	_default_script = _raw_script_edit.text
+	
 	list_elements("rooms", game_to_load.get_all_rooms(), _room_list)
 	list_elements("actors", game_to_load.get_all_actors(), _actor_list)
 	list_elements("scripts", game_to_load.get_all_scripts(), _script_list, false)
 	
-	_room_list.connect("on_element_selected", self, "_on_room_or_actor_selected")
-	_actor_list.connect("on_element_selected", self, "_on_room_or_actor_selected")
 	_script_list.connect("on_element_selected", self, "_on_script_selected")
+	_script_list.connect("on_element_deselected", self, "_on_script_deselected")
 	
 	_display.connect("game_ended", self, "_on_game_ended")
 	
@@ -49,33 +52,25 @@ func list_elements(name: String, elements: Array, list: Node, select_first = tru
 		list.select_first()
 
 func _on_script_selected(_old_script, _new_script):
-	_room_list.deselect()
-	_actor_list.deselect()
+	_raw_script_edit.text = _new_script.target.get_code()
 
-func _on_room_or_actor_selected(_old, _new):
-	_script_list.deselect()
+func _on_script_deselected(_old_script):
+	_raw_script_edit.text = _default_script
 	
 func _on_test_room_button_pressed():
-	var current_script = _script_list.get_current()
+	var current_room = _room_list.get_current()
 	
-	if current_script:
-		play_game(GameServer.StartMode.FromScriptResource, current_script)
-		
-		
-	else:
-		var current_room = _room_list.get_current()
-		
-		if not current_room:
-			return
-		
-		var current_player = _actor_list.get_current()
-		
-		test_room(current_room, current_player)
+	if not current_room:
+		return
+	
+	var current_player = _actor_list.get_current()
+	
+	test_room(current_room, current_player)
 
 func _on_play_game_button_pressed():
 	play_game()
 	
-func _on_test_raw_button_pressed():
+func _on_test_script_button_pressed():
 	var script_text = _raw_script_edit.text
 	
 	play_game(GameServer.StartMode.FromRawScript, script_text)
