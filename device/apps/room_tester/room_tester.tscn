@@ -249,8 +249,11 @@ text = "# grog script
 #.load_actor actor_name at=pos
 
 #.wait 2
+#.wait 2 skippable=false
+
 #actor_name.say \"Dialog\"
 #actor_name.say \"Dialog\" duration=0.5
+#actor_name.say \"Dialog\" duration=2 skippable=false
 #actor_name.walk to=pos
 "
 __meta__ = {
