@@ -10,32 +10,32 @@ code_or_filename = "
 
 .load_room room2
 
-.wait 2 seconds
+.wait 2
 
 .say \"A long long time ago...\"
 
-.wait 1 seconds
+.wait 1
 
 .load_room room1
 
 .load_actor guybrush at=pos1
 .load_actor mark at=pos2
 
-.wait 2 seconds
+.wait 2
 
 guybrush.say \"Hi.\"
 mark.say \"Hi.\"
 
-.wait 0.7 seconds
+.wait 0.7
 
 guybrush.say \"How are you doing?\"
 mark.say \"I'm just fine.\"
 
-.wait 1 seconds
+.wait 1
 
 guybrush.say \"Ok.\"
 
-.wait 2 seconds
+.wait 2
 
 bust.say \"Come here Guybrush.\"
 
@@ -45,4 +45,4 @@ guybrush.say \"What?\"
 
 bust.say \"Nothing.\"
 
-.wait 1 seconds"
+.wait 1"

@@ -10,7 +10,9 @@ enum ParameterType {
 	# accepts quoted and raw strings, passes full token (keeping that information)
 	StringTokenType,
 	# parses and passes parameter as float
-	FloatType
+	FloatType,
+	# parses and passes parameter as float (either 'true' or 'false')
+	BooleanType
 }
 
 var commands = {
@@ -18,34 +20,46 @@ var commands = {
 		has_subject = false,
 		required_params = [
 			ParameterType.StringType
-		]
+		],
+		named_params = []
 	},
 	load_actor = {
 		has_subject = false,
 		required_params = [
 			ParameterType.StringType
+		],
+		named_params = [
+			{ name = "at", required = false, type = ParameterType.StringType }
 		]
 	},
 	wait = {
 		has_subject = false,
 		required_params = [
 			ParameterType.FloatType
-		]
+		],
+		named_params = []
 	},
 	say = {
 		has_subject = true,
 		required_params = [
 			ParameterType.StringTokenType
+		],
+		named_params = [
+			{ name = "duration", required = false, type = ParameterType.FloatType },
+			{ name = "skippable", required = false, type = ParameterType.BooleanType }
 		]
 	},
 	walk = {
 		has_subject = true,
-		required_params = []
-		# TODO required option 'at'
+		required_params = [],
+		named_params = [
+			{ name = "to", required = true, type = ParameterType.StringType }
+		]
 	},
 	end = {
 		has_subject = false,
-		required_params = []
+		required_params = [],
+		named_params = []
 	}
 }
 

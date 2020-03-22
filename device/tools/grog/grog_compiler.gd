@@ -47,13 +47,14 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 	
 	while i < num_lines:
 		var current_line = lines[i]
+		var line_num = current_line.line_number
 		i += 1
 		
 		# expecting actions like ":pick_up" or ":start"
 		
 		if not current_line.is_routine_header:
 			# this can only happen at the start of the script
-			compiled_script.add_error("Expecting action header (line %s)" % current_line.line_number)
+			compiled_script.add_error("Expecting action header (line %s)" % line_num)
 			return
 		
 		# reading routine header line
@@ -71,6 +72,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 			# reading command line
 			
 			current_line = lines[i]
+			line_num = current_line.line_number
 			i += 1
 			
 			var subject: String = current_line.subject
@@ -78,13 +80,13 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 			var params: Array = current_line.params
 			
 			if not grog.commands.has(command):
-				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, current_line.line_number])
+				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, line_num])
 				return
 			
 			var command_requirements = grog.commands[command]
 			
 			if subject and not command_requirements.has_subject:
-				compiled_script.add_error("Command '%s' can't has subject (line %s)" % [command, current_line.line_number])
+				compiled_script.add_error("Command '%s' can't has subject (line %s)" % [command, line_num])
 				return
 			
 			var total = params.size()
@@ -92,7 +94,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 			var num_required = required.size()
 			
 			if total < num_required:
-				compiled_script.add_error("Command '%s' needs at least %s parameters (line %s)" % [command, num_required, current_line.line_number])
+				compiled_script.add_error("Command '%s' needs at least %s parameters (line %s)" % [command, num_required, line_num])
 				return
 			
 			var final_params = []
@@ -100,7 +102,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 			if command_requirements.has_subject:
 				final_params.append(subject)
 			
-			# checks and pushes required parameters and removes them rom params list
+			# checks and pushes required parameters and removes them from params list
 			for j in range(num_required):
 				var param_token = params.pop_front() # removes first param
 				
@@ -114,20 +116,73 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 					grog.ParameterType.FloatType:
 						var float_str = param_token.content
 						if not float_str_is_valid(float_str):
-							compiled_script.add_error("Token '%s' is not a valid float parameter (line %s)" % [float_str, current_line.line_number])
+							compiled_script.add_error("Token '%s' is not a valid float parameter (line %s)" % [float_str, line_num])
 							return
 						param = float(param_token.content)
 					_:
-						compiled_script.add_error("Grog error: unexpected parameter type")
-						return 
+						compiled_script.add_error("Grog error: unexpected parameter type %s" % required[j])
+						return
 				
 				final_params.append(param)
 			
-			# saves array of optional parameters
-			var optional_params = []
-			for j in range(params.size()):
-				optional_params.append(params[j])
-			final_params.append(optional_params)
+			var options = {}
+			
+			var named: Array = command_requirements.named_params
+			var num_named = named.size()
+			
+			for j in range(num_named):
+				var named_option: Dictionary = named[j]
+				
+				var option_name: String = named_option.name
+				var option_type = named_option.type
+				var is_required: bool = named_option.required
+				
+				var option_values: Array = extract_option_values(params, option_name)
+				
+				match option_values.size():
+					0:
+						if is_required:
+							compiled_script.add_error("Command '%s' requires option '%s' (line %s)" % [command, option_name, line_num])
+							return
+
+					1:
+						var option_raw_value: String = option_values[0]
+						var option_value
+						match option_type:
+							grog.ParameterType.StringType:
+								option_value = option_raw_value
+							grog.ParameterType.FloatType:
+								if not float_str_is_valid(option_raw_value):
+									compiled_script.add_error("Option '%s' is not a valid float (line %s)" % [option_raw_value, line_num])
+									return
+								
+								option_value = float(option_raw_value)
+								
+							grog.ParameterType.BooleanType:
+								if option_raw_value.to_lower() == "false":
+									option_value = false
+								elif option_raw_value.to_lower() == "true":
+									option_value = true
+								else:
+									compiled_script.add_error("Option '%s' is not a valid boolean (line %s)" % [option_raw_value, line_num])
+									return
+								
+							_:
+								compiled_script.add_error("Grog error: unexpected option type %s" % option_type)
+								return
+						
+						options[option_name] = option_value
+					_:
+						compiled_script.add_error("Duplicated option '%s' (line %s)" % [option_name, line_num])
+						return
+				
+			if params.size() > 0:
+				for j in range(params.size()):
+					var param = params[j]
+					compiled_script.add_error("%s: invalid param '%s' (line %s)" % [command, token_str(param), line_num])
+			
+			# saves array of options parameters
+			final_params.append(options)
 			
 			statements.append({
 				command = command,
@@ -137,6 +192,20 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 		compiled_script.add_routine(routine_name, statements)
 		
 	#return compiled_script
+
+func extract_option_values(params: Array, option_name: String) -> Array:
+	var ret = []
+	for i in range(params.size()):
+		var index = i - ret.size()
+		var param_token: Dictionary = params[index]
+		var param_content: String = param_token.content
+		var prefix = option_name + "="
+		
+		if param_token.type == TOKEN_RAW and param_content.begins_with(prefix) and param_content.length() > prefix.length():
+			ret.append(param_content.substr(prefix.length()))
+			params.remove(index)
+			
+	return ret
 
 func identify_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 	for i in range(lines.size()):

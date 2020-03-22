@@ -126,7 +126,7 @@ func run_compiled(compiled_script: CompiledGrogScript, routine_name: String):
 
 #	@COMMANDS
 
-func load_room(room_name: String, _params = []):
+func load_room(room_name: String, _options = {}):
 	var room = _load_room(room_name)
 	
 	if room:
@@ -137,13 +137,17 @@ func load_room(room_name: String, _params = []):
 	
 	return empty_action
 
-func load_actor(actor_name: String, params = []):
+func load_actor(actor_name: String, options = {}):
+	if not current_room:
+		print("There's no room!")
+		return empty_action
+	
 	var starting_position
-
-	var at_parameter: Node = get_option_as_room_node(params, "at")
-
-	if at_parameter:
-		starting_position = at_parameter.position
+	
+	var at_node: Node = get_option_as_room_node("at", options)
+	
+	if at_node:
+		starting_position = at_node.position
 	else:
 		starting_position = current_room.get_default_player_position()
 
@@ -159,12 +163,12 @@ func load_actor(actor_name: String, params = []):
 	
 	return empty_action
 
-func wait(delay_seconds: float, _params = []):
+func wait(delay_seconds: float, _options = {}):
 	server_event("wait_started", [delay_seconds])
 	
 	return { block = true, routine = _wait_routine(delay_seconds) }
 
-func say(item_name: String, speech_token: Dictionary, _params = []):
+func say(item_name: String, speech_token: Dictionary, options = {}):
 	var speech: String
 	if speech_token.type == GrogCompiler.TOKEN_QUOTED:
 		speech = speech_token.content
@@ -177,28 +181,31 @@ func say(item_name: String, speech_token: Dictionary, _params = []):
 		if not item:
 			return empty_action
 	
-	# TODO
-	var delay_seconds = 2.0
+	var duration: float = options.get("duration", 2.0) # TODO harcoded default say duration
+	var skippable: bool = options.get("skippable", false) # TODO harcoded default say skippable
 	
-	server_event("say", [item, speech, delay_seconds])
+	# TODO implement skippable
 	
-	return { block = true, routine = _wait_routine(delay_seconds) }
+	server_event("say", [item, speech, duration])
+	
+	return { block = true, routine = _wait_routine(duration) }
 
-func walk(item_name: String, params: Array):
+func walk(item_name: String, options: Dictionary):
 	if not item_name:
+		print("Walk action needs a subject") # TODO check in compiler?
 		return empty_action
 	
 	var item = get_item_named(item_name)
 	if not item:
 		return empty_action
 	
-	var to_parameter: Node = get_option_as_room_node(params, "to")
+	var to_node: Node = get_option_as_room_node("to", options)
 
-	if not to_parameter:
-		print("parameter 'to' needed for walk")
+	if not to_node:
+		push_error("parameter 'to' needed for walk")
 		return empty_action
 	
-	var target_position = to_parameter.position
+	var target_position = to_node.position
 	
 	return _walk_to(item, target_position)
 	
@@ -207,30 +214,18 @@ func end(_params = []):
 	
 ##############################
 
-func get_option(params: Array, option_name: String) -> String:
-	for i in range(0, params.size()):
-		var param: Dictionary = params[i]
-		var prefix = option_name + "="
-		if param.type == GrogCompiler.TOKEN_RAW and param.content.begins_with(prefix):
-			return param.content.substr(prefix.length())
-	return ""
+func get_option_as_room_node(option_name: String, options: Dictionary) -> Node:
+	if not options.has(option_name):
+		return null
+	
+	var node_name: String = options[option_name]
+	
+	if not current_room.has_node(node_name):
+		print("Node '%s' not found" % node_name)
+		return null
+		
+	return current_room.get_node(node_name)
 
-func get_option_as_room_node(params: Array, option_name: String) -> Node:
-	if not current_room:
-		return null
-	
-	var node_name = get_option(params, option_name)
-	
-	if not node_name:
-		return null
-	
-	if current_room.has_node(node_name):
-		return current_room.get_node(node_name)
-	
-	print("Room child '%s' not found" % node_name)
-	
-	return null
-	
 ##############################
 
 func _load_room(room_name: String) -> Node:

@@ -250,6 +250,7 @@ text = "# grog script
 
 #.wait 2
 #actor_name.say \"Dialog\"
+#actor_name.say \"Dialog\" duration=0.5
 #actor_name.walk to=pos
 "
 __meta__ = {
