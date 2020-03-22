@@ -98,6 +98,12 @@ __meta__ = {
 
 [node name="room_list" parent="ui_layer/ui/test_rooms/lists/room_list_column/room_list_border" instance=ExtResource( 7 )]
 
+[node name="header" parent="ui_layer/ui/test_rooms/lists/room_list_column/room_list_border/room_list/elements" index="0"]
+margin_right = 368.0
+
+[node name="Label" parent="ui_layer/ui/test_rooms/lists/room_list_column/room_list_border/room_list/elements/header" index="0"]
+text = "ROOM_TESTER_ROOMS"
+
 [node name="actor_list_column" type="Control" parent="ui_layer/ui/test_rooms/lists"]
 margin_left = 432.0
 margin_right = 860.0
@@ -123,6 +129,12 @@ __meta__ = {
 }
 
 [node name="actor_list" parent="ui_layer/ui/test_rooms/lists/actor_list_column/actor_list_border" instance=ExtResource( 7 )]
+
+[node name="header" parent="ui_layer/ui/test_rooms/lists/actor_list_column/actor_list_border/actor_list/elements" index="0"]
+margin_right = 368.0
+
+[node name="Label" parent="ui_layer/ui/test_rooms/lists/actor_list_column/actor_list_border/actor_list/elements/header" index="0"]
+text = "ROOM_TESTER_ACTORS"
 
 [node name="test_room_button" type="Button" parent="ui_layer/ui/test_rooms"]
 anchor_left = 0.5
@@ -177,6 +189,12 @@ __meta__ = {
 }
 
 [node name="script_list" parent="ui_layer/ui/test_scripts/script_list_column/script_list_border" instance=ExtResource( 7 )]
+
+[node name="header" parent="ui_layer/ui/test_scripts/script_list_column/script_list_border/script_list/elements" index="0"]
+margin_right = 370.0
+
+[node name="Label" parent="ui_layer/ui/test_scripts/script_list_column/script_list_border/script_list/elements/header" index="0"]
+text = "ROOM_TESTER_SCRIPTS"
 
 [node name="test_raw" type="NinePatchRect" parent="ui_layer/ui/test_scripts"]
 self_modulate = Color( 0.376471, 0.360784, 0.431373, 0 )
@@ -281,3 +299,9 @@ visible = false
 [connection signal="pressed" from="ui_layer/ui/test_scripts/test_script_button" to="." method="_on_test_script_button_pressed"]
 [connection signal="pressed" from="ui_layer/ui/play_game_button" to="." method="_on_play_game_button_pressed"]
 [connection signal="pressed" from="ui_layer/ui/quit_button" to="." method="_on_quit_button_pressed"]
+
+[editable path="ui_layer/ui/test_rooms/lists/room_list_column/room_list_border/room_list"]
+
+[editable path="ui_layer/ui/test_rooms/lists/actor_list_column/actor_list_border/actor_list"]
+
+[editable path="ui_layer/ui/test_scripts/script_list_column/script_list_border/script_list"]

@@ -29,11 +29,6 @@ func is_active():
 	
 ##############################
 
-func set_ready():
-	pass
-
-##############################
-
 func teleport(target_pos):
 	position = target_pos
 	on_teleport(target_pos)
