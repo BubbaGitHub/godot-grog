@@ -37,7 +37,9 @@ var commands = {
 		required_params = [
 			ParameterType.FloatType
 		],
-		named_params = []
+		named_params = [
+			{ name = "skippable", required = false, type = ParameterType.BooleanType }
+		]
 	},
 	say = {
 		has_subject = true,

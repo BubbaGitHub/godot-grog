@@ -43,7 +43,7 @@ func init(game_server):
 	server.start_game(_room_place)
 
 func _input(event):
-	if not server or not server.is_ready():
+	if not server:
 		return
 	
 	if event is InputEventMouseButton:
@@ -61,6 +61,9 @@ func _input(event):
 						_left_click(input_position)
 					
 					input_state = InputState.Nothing
+		elif event.button_index == BUTTON_RIGHT:
+			if event.pressed:
+				server.skip()
 
 func on_server_event(event_name, args):
 	var handler_name = "on_" + event_name

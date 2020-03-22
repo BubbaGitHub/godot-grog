@@ -26,6 +26,14 @@ var _game_start_param
 
 const empty_action = { block = false }
 
+enum State {
+	None,
+	Waiting,
+	WaitingSkippable,
+	Skipped
+}
+var _state = State.None
+
 func init_game(game_data: Resource, p_game_start_mode = StartMode.Default, p_game_start_param = null) -> bool:
 	data = game_data
 	
@@ -163,10 +171,12 @@ func load_actor(actor_name: String, options = {}):
 	
 	return empty_action
 
-func wait(delay_seconds: float, _options = {}):
-	server_event("wait_started", [delay_seconds])
+func wait(duration: float, options = {}):
+	server_event("wait_started", [duration])
 	
-	return { block = true, routine = _wait_routine(delay_seconds) }
+	var skippable: bool = options.get("skippable", true) # TODO harcoded default wait skippable
+	
+	return { block = true, routine = _wait_routine(duration, skippable) }
 
 func say(item_name: String, speech_token: Dictionary, options = {}):
 	var speech: String
@@ -182,13 +192,11 @@ func say(item_name: String, speech_token: Dictionary, options = {}):
 			return empty_action
 	
 	var duration: float = options.get("duration", 2.0) # TODO harcoded default say duration
-	var skippable: bool = options.get("skippable", false) # TODO harcoded default say skippable
+	var skippable: bool = options.get("skippable", true) # TODO harcoded default say skippable
+
+	server_event("say", [item, speech, duration]) # TODO pass skippable param
 	
-	# TODO implement skippable
-	
-	server_event("say", [item, speech, duration])
-	
-	return { block = true, routine = _wait_routine(duration) }
+	return { block = true, routine = _wait_routine(duration, skippable) }
 
 func walk(item_name: String, options: Dictionary):
 	if not item_name:
@@ -278,10 +286,17 @@ func _load_actor(actor_name: String, starting_position: Vector2) -> Node:
 	
 	return actor
 
-func _wait_routine(delay_seconds: float):
+func _wait_routine(delay_seconds: float, skippable: bool):
 	var elapsed = 0.0
 	
+	if skippable:
+		_state = State.WaitingSkippable
+	else:
+		_state = State.Waiting
+	
 	while elapsed < delay_seconds:
+		if skippable and _state == State.Skipped:
+			break
 		elapsed += yield()
 	
 	server_event("wait_ended")
@@ -354,6 +369,10 @@ func server_event(event_name: String, args: Array = []):
 
 #### Client calls
 
+func skip():
+	if _state == State.WaitingSkippable:
+		_state = State.Skipped
+
 func is_ready():
 	return event_queue.is_ready()
 
@@ -361,6 +380,9 @@ func has_started():
 	return event_queue.started
 	
 func go_to(target_position: Vector2):
+	if not is_ready():
+		return # TODO!
+	
 	if not current_player or not current_player.is_ready():
 		return
 	
