@@ -247,6 +247,8 @@ text = "# grog script
 #.load_room room_name
 #.load_actor actor_name
 #.load_actor actor_name at=pos
+#.enable_input
+#.disable_input
 
 #.wait 2
 #.wait 2 skippable=false

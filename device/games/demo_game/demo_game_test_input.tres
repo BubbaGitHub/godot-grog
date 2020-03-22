@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://tools/grog/grog_script.gd" type="Script" id=1]
+
+[resource]
+resource_name = "test input"
+script = ExtResource( 1 )
+code_or_filename = "
+:start
+
+.load_room room1
+.load_actor mark at=pos2
+
+.enable_input
+
+.say \"In this case\"
+.say \"you should be able to move\"
+.say \"while I'm saying this.\"
+
+.wait 2
+
+.say \"But it's not working yet!\""

@@ -32,6 +32,16 @@ var commands = {
 			{ name = "at", required = false, type = ParameterType.StringType }
 		]
 	},
+	enable_input = {
+		has_subject = false,
+		required_params = [],
+		named_params = []
+	},
+	disable_input = {
+		has_subject = false,
+		required_params = [],
+		named_params = []
+	},
 	wait = {
 		has_subject = false,
 		required_params = [

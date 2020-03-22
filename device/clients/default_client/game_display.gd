@@ -8,8 +8,15 @@ export (NodePath) var controls_place_path
 export (NodePath) var text_label_path
 export (NodePath) var text_label_anchor_path
 
+# debug flags
+export (NodePath) var input_enabled_flag_path
+export (NodePath) var skippable_flag_path
+
 # Server
 var server
+
+var _skippable: bool
+var _input_enabled: bool
 
 # Input
 enum InputState { Nothing, DoingLeftClick }
@@ -25,6 +32,9 @@ var _text_label_anchor: Control
 
 var _default_text_position: Vector2
 
+var _input_enabled_flag: CheckButton
+var _skippable_flag: CheckButton
+
 func _ready():
 	_room_place = get_node(room_place_path)
 	_controls_place = get_node(controls_place_path)
@@ -33,6 +43,9 @@ func _ready():
 	_text_label_anchor = get_node(text_label_anchor_path)
 	
 	_default_text_position = _text_label_anchor.rect_position
+	
+	_input_enabled_flag = get_node(input_enabled_flag_path)
+	_skippable_flag = get_node(skippable_flag_path)
 
 func init(game_server):
 	server = game_server
@@ -76,12 +89,20 @@ func on_server_event(event_name, args):
 #	@SERVER EVENTS
 
 func on_game_started():
-	pass
+	_set_skippable(false)
+	_set_input_enabled(false)
 
 func on_game_ended():
 	_text_label.clear()
 	_hide_controls()
+	
 	emit_signal("game_ended")
+
+func on_input_enabled():
+	_set_input_enabled(true)
+	
+func on_input_disnabled():
+	_set_input_enabled(false)
 
 func on_room_loaded(_room):
 	pass
@@ -89,16 +110,19 @@ func on_room_loaded(_room):
 func on_actor_loaded(_actor):
 	pass
 
-func on_wait_started(_seconds):
-	# start waiting '_seconds' seconds
+func on_wait_started(_duration: float, skippable: bool):
+	# start waiting '_duration' seconds
 	
 	_hide_controls()
+	_set_skippable(skippable)
 
 func on_wait_ended():
-	_text_label.clear()
+	_text_label.clear() # do always?
+	if _skippable:
+		_set_skippable(false)
 
-func on_say(subject, speech, _seconds):
-	# start waiting '_seconds' seconds
+func on_say(subject: Node, speech: String, _duration: float, skippable: bool):
+	# start waiting '_duration' seconds
 	
 	if subject:
 		var position = subject.get_speech_position() + _room_place.rect_position
@@ -106,11 +130,11 @@ func on_say(subject, speech, _seconds):
 	else:
 		_say_text(speech, server.get_default_color(), _default_text_position)
 	
+	_set_skippable(skippable)
 
-func on_set_ready():
+#func on_set_ready():
 	# end waiting
-	
-	_show_controls()
+	#_show_controls()
 	#_text_label.clear()
 	
 	
@@ -142,3 +166,13 @@ func _hide_controls():
 func _on_quit_button_pressed():
 	if server:
 		server.stop()
+
+#	@DEBUG FLAGS
+
+func _set_skippable(new_value: bool):
+	_skippable = new_value
+	_skippable_flag.pressed = new_value
+
+func _set_input_enabled(new_value: bool):
+	_input_enabled = new_value
+	_input_enabled_flag.pressed = new_value

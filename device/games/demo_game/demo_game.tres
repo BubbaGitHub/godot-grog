@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=10 format=2]
+[gd_resource type="Resource" load_steps=11 format=2]
 
 [ext_resource path="res://tools/grog/game_resource.gd" type="Script" id=1]
 [ext_resource path="res://games/demo_game/rooms/room1/demo_room.tres" type="Resource" id=2]
@@ -9,10 +9,11 @@
 [ext_resource path="res://games/demo_game/actors/mark/mark.tres" type="Resource" id=7]
 [ext_resource path="res://games/demo_game/demo_game_test_translation.tres" type="Resource" id=8]
 [ext_resource path="res://games/demo_game/demo_game_test_skipping.tres" type="Resource" id=9]
+[ext_resource path="res://games/demo_game/demo_game_test_input.tres" type="Resource" id=10]
 
 [resource]
 script = ExtResource( 1 )
-scripts = [ ExtResource( 5 ), ExtResource( 8 ), ExtResource( 9 ) ]
+scripts = [ ExtResource( 5 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ) ]
 rooms = [ ExtResource( 2 ), ExtResource( 3 ) ]
 actors = [ ExtResource( 6 ), ExtResource( 7 ) ]
 game_server_model = ExtResource( 4 )

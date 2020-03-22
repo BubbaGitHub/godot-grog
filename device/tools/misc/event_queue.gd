@@ -49,8 +49,20 @@ func coroutine():
 		while true:
 			var next_action = _pending_actions.pop_front()
 			
+			var command = next_action.command
 			var params = next_action.params if next_action.has("params") else []
-			var action_result = _get_target().callv(next_action.command, params)
+			
+			var action_result = _get_target().callv(command, params)
+			
+			if not action_result:
+				push_error("Command %s: no action returned (%s)" % [command, action_result])
+				return null
+			elif typeof(action_result) != TYPE_DICTIONARY:
+				push_error("Command %s: action should be a dictionary (%s)" % [command, action_result])
+				return null
+			elif not ((action_result.has("stop") and action_result.stop) or action_result.has("block")):
+				push_error("Command %s: invalid action dictionary (%s)" % [command, action_result])
+				return null
 			
 			if action_result.has("stop") and action_result.stop:
 				return null # stops coroutine

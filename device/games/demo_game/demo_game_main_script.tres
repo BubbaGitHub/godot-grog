@@ -45,4 +45,7 @@ guybrush.say \"What?\"
 
 bust.say \"Nothing.\"
 
-.wait 1"
+.wait 1
+
+.enable_input
+"

@@ -33,6 +33,7 @@ enum State {
 	Skipped
 }
 var _state = State.None
+var _input_enabled = false
 
 func init_game(game_data: Resource, p_game_start_mode = StartMode.Default, p_game_start_param = null) -> bool:
 	data = game_data
@@ -94,7 +95,7 @@ func start_game(p_root_node: Node):
 			run_compiled(_game_start_param, "start")
 
 func event_queue_set_ready():
-	server_event("set_ready")
+	pass # server_event("set_ready")
 
 func event_queue_stopped():
 	_free_all()
@@ -171,10 +172,30 @@ func load_actor(actor_name: String, options = {}):
 	
 	return empty_action
 
-func wait(duration: float, options = {}):
-	server_event("wait_started", [duration])
+func enable_input(_options = {}):
+	if _input_enabled:
+		log_command_warning(["enable_input", "input is already enabled"])
+		return
 	
+	_input_enabled = true
+	server_event("input_enabled")
+	
+	return empty_action
+
+func disable_input(_options = {}):
+	if not _input_enabled:
+		log_command_warning(["disable_input", "input is not enabled"])
+		return
+	
+	_input_enabled = false
+	server_event("input_disabled")
+	
+	return empty_action
+
+func wait(duration: float, options = {}):
 	var skippable: bool = options.get("skippable", true) # TODO harcoded default wait skippable
+	
+	server_event("wait_started", [duration, skippable])
 	
 	return { block = true, routine = _wait_routine(duration, skippable) }
 
@@ -194,7 +215,7 @@ func say(item_name: String, speech_token: Dictionary, options = {}):
 	var duration: float = options.get("duration", 2.0) # TODO harcoded default say duration
 	var skippable: bool = options.get("skippable", true) # TODO harcoded default say skippable
 
-	server_event("say", [item, speech, duration]) # TODO pass skippable param
+	server_event("say", [item, speech, duration, skippable])
 	
 	return { block = true, routine = _wait_routine(duration, skippable) }
 
@@ -380,8 +401,8 @@ func has_started():
 	return event_queue.started
 	
 func go_to(target_position: Vector2):
-	if not is_ready():
-		return # TODO!
+	if not _input_enabled:
+		return
 	
 	if not current_player or not current_player.is_ready():
 		return
@@ -437,6 +458,27 @@ func get_resource_in(list, elem_name):
 			return elem
 	return null
 
+#### Logging
+
+enum LogLevel {
+	Ok,
+	Warning,
+	Error
+}
+
+func log_command_ok(args: Array):
+	log_command(LogLevel.Ok, args)
+	
+func log_command_warning(args: Array):
+	log_command(LogLevel.Warning, args)
+
+func log_command_error(args: Array):
+	log_command(LogLevel.Error, args)
+	
+func log_command(level, args: Array):
+	print("%s:\t%s" % [LogLevel.keys()[level], args])
+
 #### Misc
+
 func get_default_color():
 	return Color.gray

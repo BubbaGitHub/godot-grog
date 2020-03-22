@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://clients/default_client/game_display.gd" type="Script" id=1]
 [ext_resource path="res://clients/default_client/pixel_intv.otf" type="DynamicFontData" id=2]
 [ext_resource path="res://clients/default_client/action.tscn" type="PackedScene" id=3]
+[ext_resource path="res://apps/room_tester/rounded_rect.png" type="Texture" id=4]
 
 [sub_resource type="DynamicFont" id=1]
 size = 32
@@ -19,6 +20,8 @@ room_place_path = NodePath("world_layer/room_area/room_anchor")
 controls_place_path = NodePath("command_area/controls")
 text_label_path = NodePath("text_layer/text_anchor/text")
 text_label_anchor_path = NodePath("text_layer/text_anchor")
+input_enabled_flag_path = NodePath("command_area/flags/VBoxContainer/input_enabled/CheckButton")
+skippable_flag_path = NodePath("command_area/flags/VBoxContainer/skippable/CheckButton")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchor_right = 1.0
@@ -84,6 +87,8 @@ __meta__ = {
 [node name="ColorRect" type="ColorRect" parent="command_area"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = -0.513306
+margin_bottom = -0.513306
 color = Color( 0.388235, 0.329412, 0.329412, 0.411765 )
 
 [node name="controls" type="Control" parent="command_area"]
@@ -161,9 +166,100 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-margin_left = 379.308
-margin_top = -126.153
-margin_right = 567.308
-margin_bottom = -51.1528
+margin_left = 673.965
+margin_top = -167.896
+margin_right = 861.965
+margin_bottom = -92.8958
 text = "Quit"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="flags" type="NinePatchRect" parent="command_area"]
+self_modulate = Color( 0.811765, 0.588235, 0.588235, 0.180392 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 1187.0
+margin_top = 30.0
+margin_right = -458.0
+margin_bottom = -32.0
+texture = ExtResource( 4 )
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="command_area/flags"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="input_enabled" type="Control" parent="command_area/flags/VBoxContainer"]
+margin_right = 255.0
+margin_bottom = 92.0
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="command_area/flags/VBoxContainer/input_enabled"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 4.10669
+margin_top = -22.2402
+margin_right = 126.107
+margin_bottom = 28.7598
+text = "Input enabled"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CheckButton" type="CheckButton" parent="command_area/flags/VBoxContainer/input_enabled"]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -92.1805
+margin_top = -16.7601
+margin_right = -16.1805
+margin_bottom = 23.2399
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="skippable" type="Control" parent="command_area/flags/VBoxContainer"]
+margin_top = 96.0
+margin_right = 255.0
+margin_bottom = 188.0
+size_flags_vertical = 3
+
+[node name="CheckButton" type="CheckButton" parent="command_area/flags/VBoxContainer/skippable"]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -92.1805
+margin_top = -16.7601
+margin_right = -16.1805
+margin_bottom = 23.2399
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="command_area/flags/VBoxContainer/skippable"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 4.10669
+margin_top = -22.2402
+margin_right = 126.107
+margin_bottom = 28.7598
+text = "Skippable"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="command_area/quit_button" to="." method="_on_quit_button_pressed"]
