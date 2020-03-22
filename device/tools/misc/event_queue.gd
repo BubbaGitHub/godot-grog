@@ -44,8 +44,7 @@ func coroutine():
 				return null
 			yield()
 		
-		# there are pending actions
-		set_busy()
+		# starts running actions
 		
 		while true:
 			var next_action = _pending_actions.pop_front()
@@ -57,6 +56,9 @@ func coroutine():
 				return null # stops coroutine
 			
 			elif action_result.block:
+				if state == State.Idle:
+					 # first blocking action in this run
+					state = State.Busy
 				if action_result.has("routine"):
 					var subroutine = action_result.routine
 					
@@ -69,16 +71,15 @@ func coroutine():
 					print("'block' is true but no 'routine'")
 			
 			if not _pending_actions:
-				set_ready()
+				# ends running actions
+				if state == State.Busy:
+					# there were blocking actions in this run
+					# so we get ready now
+					state = State.Idle
+					_get_target().event_queue_set_ready()
+				
 				break
 
-func set_ready():
-	state = State.Idle
-	_get_target().event_queue_set_ready()
-
-func set_busy():
-	state = State.Busy
-	
 func is_ready():
 	return started and state == State.Idle
 
