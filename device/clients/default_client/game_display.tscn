@@ -227,6 +227,7 @@ margin_left = -92.1805
 margin_top = -16.7601
 margin_right = -16.1805
 margin_bottom = 23.2399
+disabled = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -246,6 +247,7 @@ margin_left = -92.1805
 margin_top = -16.7601
 margin_right = -16.1805
 margin_bottom = 23.2399
+disabled = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
