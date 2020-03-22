@@ -93,6 +93,7 @@ func on_game_started():
 	_set_input_enabled(false)
 
 func on_game_ended():
+	server = null
 	_text_label.clear()
 	_hide_controls()
 	
@@ -101,12 +102,12 @@ func on_game_ended():
 func on_input_enabled():
 	_set_input_enabled(true)
 	
-func on_input_disnabled():
+func on_input_disabled():
 	_set_input_enabled(false)
 
 func on_room_loaded(_room):
 	pass
-	
+
 func on_actor_loaded(_actor):
 	pass
 
@@ -137,12 +138,32 @@ func on_say(subject: Node, speech: String, _duration: float, skippable: bool):
 	#_show_controls()
 	#_text_label.clear()
 	
-	
+
 #	@PRIVATE
 
-func _left_click(at_position):
-	server.go_to(at_position)
+func _left_click(position: Vector2):
+	if not server.current_room:
+		print("No room")
+		return
 	
+	var clicked_item = _get_item_at(position)
+	
+	if clicked_item:
+		server.interact(clicked_item, "look")
+	else:
+		server.go_to(position)
+
+func _get_item_at(position: Vector2):
+	for item in server.current_room.get_items():
+		
+		var disp: Vector2 = item.global_position - position
+		var distance = disp.length()
+		
+		if distance <= item.radius:
+			return item
+	
+	return null
+
 func _say_text(speech, color, text_position):
 	_hide_controls()
 	

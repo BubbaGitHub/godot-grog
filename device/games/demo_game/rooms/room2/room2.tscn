@@ -5,9 +5,6 @@
 [ext_resource path="res://games/demo_game/rooms/room1/images/table.png" type="Texture" id=3]
 [ext_resource path="res://tools/grog/room.gd" type="Script" id=4]
 
-
-
-
 [sub_resource type="NavigationPolygon" id=1]
 vertices = PoolVector2Array( 436.868, 546.816, 495.184, 579.457, 391.092, 579.324, 221.168, 567.81, 475.346, 666.896, 251.455, 617.09, 617.982, 667.559, 704, 768, -541.651, 767.385, -134.578, 617.09, -276.7, 547.05, -116.127, 567.29 )
 polygons = [ PoolIntArray( 0, 1, 2, 3 ), PoolIntArray( 2, 4, 5, 3 ), PoolIntArray( 6, 7, 8, 4 ), PoolIntArray( 5, 4, 8, 9 ), PoolIntArray( 9, 8, 10, 11 ), PoolIntArray( 11, 10, 0, 3 ) ]
@@ -49,3 +46,5 @@ navpoly = SubResource( 1 )
 
 [node name="default_player_position" type="Position2D" parent="."]
 position = Vector2( 198.515, 719.745 )
+
+[node name="items" type="Node2D" parent="."]

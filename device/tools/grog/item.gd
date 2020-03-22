@@ -3,8 +3,6 @@ extends Node2D
 export (String) var global_id
 export (Color) var color
 
-export (NodePath) var speech_position_path
-
 export (float) var walk_speed = 300 # pixels per second
 
 #warning-ignore:unused_signal
@@ -37,8 +35,11 @@ func teleport(target_pos):
 func on_teleport(_target_pos):
 	pass
 
-func get_speech_position():
-	if speech_position_path and has_node(speech_position_path):
-		return position + get_node(speech_position_path).position
+func position_of_child_at(position_path: NodePath):
+	if position_path and has_node(position_path):
+		return position + get_node(position_path).position
 	else:
 		return position
+	
+func get_interact_position():
+	return position_of_child_at("interact_position")

@@ -4,10 +4,7 @@
 [ext_resource path="res://games/demo_game/rooms/room1/images/desk.png" type="Texture" id=2]
 [ext_resource path="res://games/demo_game/rooms/room1/images/table.png" type="Texture" id=3]
 [ext_resource path="res://tools/grog/room.gd" type="Script" id=4]
-[ext_resource path="res://tools/grog/item.gd" type="Script" id=6]
-
-
-
+[ext_resource path="res://tools/2d/item2d.gd" type="Script" id=5]
 
 [sub_resource type="NavigationPolygon" id=1]
 vertices = PoolVector2Array( 436.868, 546.816, 495.184, 579.457, 391.092, 579.324, 221.168, 567.81, 475.346, 666.896, 251.455, 617.09, 617.982, 667.559, 704, 768, -541.651, 767.385, -134.578, 617.09, -276.7, 547.05, -116.127, 567.29 )
@@ -63,6 +60,10 @@ position = Vector2( 231.293, 555.372 )
 
 [node name="bust" type="Node2D" parent="items"]
 position = Vector2( 327.674, 328.927 )
-script = ExtResource( 6 )
+script = ExtResource( 5 )
 global_id = "bust"
 color = Color( 0.76, 0.76, 0.76, 1 )
+radius = 50.0
+
+[node name="interact_position" type="Position2D" parent="items/bust"]
+position = Vector2( -134.867, 228.481 )

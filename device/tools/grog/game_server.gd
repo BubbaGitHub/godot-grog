@@ -411,7 +411,27 @@ func go_to(target_position: Vector2):
 		command = "_walk_to",
 		params = [current_player, target_position, true]
 	})
+
+func interact(item: Node2D, _action: String):
+	if not _input_enabled:
+		return
+		
+	if not current_player or not current_player.is_ready():
+		return
+		
+	if not current_room.is_a_parent_of(item):
+		print("No item in room")
+		return
 	
+	var target_position = item.get_interact_position()
+	
+	event_queue.push_action({
+		command = "_walk_to",
+		params = [current_player, target_position, false]
+	})
+	
+	# TODO
+
 func stop():
 	event_queue.stop_asap()
 

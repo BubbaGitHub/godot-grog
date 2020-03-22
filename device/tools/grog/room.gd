@@ -24,3 +24,6 @@ func get_node_if_present(node_path):
 	
 	return get_node(node_path)
 
+func get_items():
+	# TODO do some check?
+	return $items.get_children()
