@@ -7,7 +7,7 @@ class_name GrogCompiler
 const line_regex_pattern = "^(\\t)*(\\S|\\ )*$"
 
 # Compiler patterns
-const routine_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
+const sequence_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
 
 const command_regex_pattern = "^([a-zA-Z0-9\\-\\_\\ \\#]*)\\.([a-zA-Z0-9\\-\\_\\ \\#]+)$"
 
@@ -52,19 +52,28 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 		
 		# expecting actions like ":pick_up" or ":start"
 		
-		if not current_line.is_routine_header:
+		if not current_line.is_sequence_header:
 			# this can only happen at the start of the script
 			compiled_script.add_error("Expecting action header (line %s)" % line_num)
 			return
 		
-		# reading routine header line
+		# reading sequence header line
 		
-		var routine_name = current_line.routine_name
+		var sequence_name: String = current_line.sequence_name
+		var params: Array = current_line.params
+		
+		# TODO telekinetic
+		
+		if params.size() > 0 and false: # TODO!
+			for j in range(params.size()):
+				var param = params[j]
+				compiled_script.add_error("Sequence '%s': invalid param '%s' (line %s)" % [sequence_name, token_str(param), line_num])
+				return
 		
 		var statements = []
 		
 		while true:
-			var more_statements = i < num_lines and not lines[i].is_routine_header
+			var more_statements = i < num_lines and not lines[i].is_sequence_header
 			
 			if not more_statements:
 				break
@@ -74,10 +83,9 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 			current_line = lines[i]
 			line_num = current_line.line_number
 			i += 1
-			
 			var subject: String = current_line.subject
 			var command: String = current_line.command
-			var params: Array = current_line.params
+			params = current_line.params
 			
 			if not grog.commands.has(command):
 				compiled_script.add_error("Unknown command '%s' (line %s)" % [command, line_num])
@@ -180,6 +188,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 				for j in range(params.size()):
 					var param = params[j]
 					compiled_script.add_error("%s: invalid param '%s' (line %s)" % [command, token_str(param), line_num])
+					return
 			
 			# saves array of options parameters
 			final_params.append(options)
@@ -189,7 +198,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 				params = final_params
 			})
 		
-		compiled_script.add_routine(routine_name, statements)
+		compiled_script.add_sequence(sequence_name, statements)
 		
 	#return compiled_script
 
@@ -225,16 +234,16 @@ func identify_line(compiled_script: CompiledGrogScript, line: Dictionary) -> voi
 	var first_content: String = first_token.content
 	
 	if first_content.begins_with(":"):
-		# it's a routine header
-		var result = routine_header_regex().search(first_content)
+		# it's a sequence header
+		var result = sequence_header_regex().search(first_content)
 		if not result:
-			compiled_script.add_error("Routine name '%s' is not valid (line %s)" % [first_content, line.line_number])
+			compiled_script.add_error("Sequence name '%s' is not valid (line %s)" % [first_content, line.line_number])
 			return
 		
-		# TODO check routine headers parameters or additional tokens (if any)
+		# TODO check sequence headers parameters or additional tokens (if any)
 		
-		line.is_routine_header = true
-		line.routine_name = result.strings[1]
+		line.is_sequence_header = true
+		line.sequence_name = result.strings[1]
 		
 	else:
 		# it's a command
@@ -252,13 +261,13 @@ func identify_line(compiled_script: CompiledGrogScript, line: Dictionary) -> voi
 			
 		# TODO do a basic check over parameters?
 		
-		var params: Array = line.tokens
-		params.pop_front()
-		
-		line.is_routine_header = false
+		line.is_sequence_header = false
 		line.subject = result.strings[1]
 		line.command = result.strings[2]
-		line.params = params
+	
+	var params: Array = line.tokens
+	params.pop_front()
+	line.params = params
 	
 func tokenize_lines(compiled_script: CompiledGrogScript, raw_lines: Array) -> Array:
 	var ret = []
@@ -426,8 +435,8 @@ func contains_pattern(a_string: String, pattern: RegEx) -> bool:
 func line_regex():
 	return regex(line_regex_pattern)
 
-func routine_header_regex():
-	return regex(routine_header_regex_pattern)
+func sequence_header_regex():
+	return regex(sequence_header_regex_pattern)
 
 func command_regex():
 	return regex(command_regex_pattern)

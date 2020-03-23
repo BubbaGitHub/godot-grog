@@ -13,7 +13,7 @@ export (NodePath) var input_enabled_flag_path
 export (NodePath) var skippable_flag_path
 
 # Server
-var server
+var server: GameServer
 
 var _skippable: bool
 var _input_enabled: bool
@@ -53,7 +53,10 @@ func init(game_server):
 	#warning-ignore:return_value_discarded
 	server.connect("game_server_event", self, "on_server_event")
 	
-	server.start_game(_room_place)
+	if not server.start_game_request(_room_place):
+		_end_game()
+	
+	# else signal game_started was just received (or it will now)
 
 func _input(event):
 	if not server:
@@ -76,7 +79,7 @@ func _input(event):
 					input_state = InputState.Nothing
 		elif event.button_index == BUTTON_RIGHT:
 			if event.pressed:
-				server.skip()
+				server.skip_request()
 
 func on_server_event(event_name, args):
 	var handler_name = "on_" + event_name
@@ -93,11 +96,7 @@ func on_game_started():
 	_set_input_enabled(false)
 
 func on_game_ended():
-	server = null
-	_text_label.clear()
-	_hide_controls()
-	
-	emit_signal("game_ended")
+	_end_game()
 
 func on_input_enabled():
 	_set_input_enabled(true)
@@ -129,17 +128,18 @@ func on_say(subject: Node, speech: String, _duration: float, skippable: bool):
 		var position = subject.get_speech_position() + _room_place.rect_position
 		_say_text(speech, subject.color, position)
 	else:
-		_say_text(speech, server.get_default_color(), _default_text_position)
+		_say_text(speech, server.options.default_color, _default_text_position)
 	
 	_set_skippable(skippable)
 
-#func on_set_ready():
-	# end waiting
-	#_show_controls()
-	#_text_label.clear()
-	
-
 #	@PRIVATE
+
+func _end_game():
+	server = null
+	_text_label.clear()
+	_hide_controls()
+	
+	emit_signal("game_ended")
 
 func _left_click(position: Vector2):
 	if not server.current_room:
@@ -149,9 +149,9 @@ func _left_click(position: Vector2):
 	var clicked_item = _get_item_at(position)
 	
 	if clicked_item:
-		server.interact(clicked_item, "look")
+		server.interact_request(clicked_item, "look")
 	else:
-		server.go_to(position)
+		server.go_to_request(position)
 
 func _get_item_at(position: Vector2):
 	for item in server.current_room.get_items():
@@ -186,7 +186,7 @@ func _hide_controls():
 
 func _on_quit_button_pressed():
 	if server:
-		server.stop()
+		server.stop_request()
 
 #	@DEBUG FLAGS
 

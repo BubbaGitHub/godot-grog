@@ -63,7 +63,6 @@ position = Vector2( 327.674, 328.927 )
 script = ExtResource( 5 )
 global_id = "bust"
 color = Color( 0.76, 0.76, 0.76, 1 )
-radius = 50.0
 
 [node name="interact_position" type="Position2D" parent="items/bust"]
 position = Vector2( -134.867, 228.481 )

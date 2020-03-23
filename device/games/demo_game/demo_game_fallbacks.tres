@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://tools/grog/grog_script.gd" type="Script" id=1]
+
+[resource]
+resource_name = "fallbacks"
+script = ExtResource( 1 )
+code_or_filename = "# 'self' is the item
+# 'you' is the interacting player
+
+:look TK
+
+you.say \"I can't\""

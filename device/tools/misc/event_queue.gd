@@ -33,7 +33,7 @@ func grog_update(delta):
 		_routine = _routine.resume(delta)
 		
 		if not _routine:
-			_get_target().event_queue_stopped()
+			_get_target()._event_queue_stopped()
 
 func coroutine():
 	state = State.Idle
@@ -88,7 +88,7 @@ func coroutine():
 					# there were blocking actions in this run
 					# so we get ready now
 					state = State.Idle
-					_get_target().event_queue_set_ready()
+					_get_target()._event_queue_set_ready()
 				
 				break
 

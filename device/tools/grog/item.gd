@@ -3,6 +3,8 @@ extends Node2D
 export (String) var global_id
 export (Color) var color
 
+export (String, MULTILINE) var code
+
 export (float) var walk_speed = 300 # pixels per second
 
 #warning-ignore:unused_signal
@@ -10,10 +12,29 @@ signal start_walking
 #warning-ignore:unused_signal
 signal stop_walking
 
+var _compiled_script: CompiledGrogScript
+
 ##############################
 
 func _ready():
 	add_to_group("item")
+
+func get_sequence(trigger_name: String): # returns array or null
+	if not _compiled_script and code:
+		_compiled_script = grog.compile_text(code)
+		
+		if not _compiled_script.is_valid:
+			print("Item '%s': script is invalid")
+			_compiled_script.print_errors()
+	
+	if not _compiled_script:
+		print("No code")
+		return null
+	elif _compiled_script.is_valid and _compiled_script.has_sequence(trigger_name):
+		return _compiled_script.get_sequence(trigger_name)
+	else:
+		# returns null so it defaults to fallback
+		return null
 
 func is_ready():
 	# TODO implement or remove
