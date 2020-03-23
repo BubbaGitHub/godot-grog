@@ -8,7 +8,7 @@ script = ExtResource( 1 )
 code_or_filename = "# 'self' is the item
 # 'you' is the interacting player
 
-:go
+:walk_to
 # does nothing
 
 :look_at

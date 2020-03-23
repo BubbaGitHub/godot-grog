@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://clients/default_client/game_display.gd" type="Script" id=1]
 [ext_resource path="res://clients/default_client/pixel_intv.otf" type="DynamicFontData" id=2]
@@ -11,6 +11,10 @@
 size = 32
 font_data = ExtResource( 2 )
 
+[sub_resource type="DynamicFont" id=2]
+size = 45
+font_data = ExtResource( 2 )
+
 [node name="game_display" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -20,6 +24,7 @@ __meta__ = {
 }
 action_button_model = ExtResource( 3 )
 actions_path = NodePath("command_area/controls/actions")
+action_display_path = NodePath("command_area/action_display")
 room_area_path = NodePath("world_layer/room_area")
 room_place_path = NodePath("world_layer/room_area/room_anchor")
 controls_place_path = NodePath("command_area")
@@ -95,21 +100,37 @@ __meta__ = {
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -256.0
+margin_top = -309.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="ColorRect" type="ColorRect" parent="command_area"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -0.513306
 margin_bottom = -0.513306
 color = Color( 1, 1, 1, 0.0588235 )
 
+[node name="action_display" type="Label" parent="command_area"]
+modulate = Color( 0.564706, 0.2, 0.564706, 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 5.0
+margin_bottom = -251.0
+custom_fonts/font = SubResource( 2 )
+text = "Walk to path"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="controls" type="Control" parent="command_area"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = 53.0
 __meta__ = {
 "_edit_use_anchors_": false
 }

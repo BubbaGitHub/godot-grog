@@ -5,6 +5,7 @@ signal game_ended
 export (Resource) var action_button_model
 
 export (NodePath) var actions_path
+export (NodePath) var action_display_path
 
 export (NodePath) var room_area_path
 export (NodePath) var room_place_path
@@ -33,34 +34,26 @@ var current_action = null
 
 
 # Node hooks
-var _actions: Control
+onready var _actions: Control = get_node(actions_path)
+onready var _action_display: Control = get_node(action_display_path)
 
-var _room_area: Control
-var _room_place: Control
-var _controls_place: Control
+onready var _room_area: Control = get_node(room_area_path)
+onready var _room_place: Control = get_node(room_place_path)
+onready var _controls_place: Control = get_node(controls_place_path)
 
-var _text_label: RichTextLabel
-var _text_label_anchor: Control
+onready var _text_label: RichTextLabel = get_node(text_label_path)
+onready var _text_label_anchor: Control = get_node(text_label_anchor_path)
 
-var _default_text_position: Vector2
+onready var _default_text_position: Vector2 = _text_label_anchor.rect_position
 
-var _input_enabled_flag: CheckButton
-var _skippable_flag: CheckButton
+onready var _input_enabled_flag: CheckButton = get_node(input_enabled_flag_path)
+onready var _skippable_flag: CheckButton = get_node(skippable_flag_path)
 
 func _ready():
-	_actions = get_node(actions_path)
-	
-	_room_area = get_node(room_area_path)
-	_room_place = get_node(room_place_path)
-	_controls_place = get_node(controls_place_path)
-	
-	_text_label = get_node(text_label_path)
-	_text_label_anchor = get_node(text_label_anchor_path)
-	
-	_default_text_position = _text_label_anchor.rect_position
-	
-	_input_enabled_flag = get_node(input_enabled_flag_path)
-	_skippable_flag = get_node(skippable_flag_path)
+	#warning-ignore:return_value_discarded
+	_actions.connect("on_element_selected", self, "_on_action_selected")
+	#warning-ignore:return_value_discarded
+	_actions.connect("on_element_deselected", self, "_on_action_deselected")
 
 func init(p_game_server: GameServer):
 	server = p_game_server
@@ -72,9 +65,6 @@ func init(p_game_server: GameServer):
 	
 	for action_name in data.actions:
 		_actions.add_element(action_name)
-	
-	_actions.connect("on_element_selected", self, "_on_action_selected")
-	_actions.connect("on_element_deselected", self, "_on_action_deselected")
 	
 	#warning-ignore:return_value_discarded
 	server.connect("game_server_event", self, "on_server_event")
@@ -119,11 +109,13 @@ func on_server_event(event_name, args):
 #	@SERVER EVENTS
 
 func on_game_started():
-	_set_skippable(false)
-	_set_input_enabled(false)
+	_hide_all()
+	current_action = data.default_action
+	_action_display.text = current_action.capitalize()
 
 func on_game_ended():
 	_end_game()
+	_actions.deselect()
 
 func on_input_enabled():
 	_set_input_enabled(true)
@@ -163,10 +155,16 @@ func on_say(subject: Node, speech: String, _duration: float, skippable: bool):
 
 func _end_game():
 	server = null
+	_hide_all()
+		
+	emit_signal("game_ended")
+
+func _hide_all():
+	_set_skippable(false)
+	_set_input_enabled(false)
 	_text_label.clear()
 	_hide_controls()
-	
-	emit_signal("game_ended")
+	_action_display.text = ""
 
 func _left_click(position: Vector2):
 	if not server.current_room:
@@ -176,11 +174,7 @@ func _left_click(position: Vector2):
 	var clicked_item = _get_item_at(position)
 	
 	if clicked_item:
-		var action = current_action
-		if action == null:
-			action = data.default_action
-		
-		server.interact_request(clicked_item, action)
+		server.interact_request(clicked_item, current_action)
 	else:
 		server.go_to_request(position)
 
@@ -230,9 +224,11 @@ func _set_input_enabled(new_value: bool):
 func _on_action_selected(_old_view, _new_view):
 	var new_action = _new_view.get_target()
 	current_action = new_action
+	_action_display.text = new_action.capitalize()
 
 func _on_action_deselected(_old_view):
-	current_action = null
+	current_action = data.default_action
+	_action_display.text = current_action.capitalize()
 
 # Misc
 
