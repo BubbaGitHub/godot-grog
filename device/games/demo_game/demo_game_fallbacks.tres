@@ -12,22 +12,22 @@ code_or_filename = "# 'self' is the item
 # does nothing
 
 :look_at
-you.say \"I see\"
+you.say DEMO_GAME_FALLBACK_LOOK
 
 :give TK
 # does nothing
 
 :use TK
-you.say \"I can't\"
+you.say DEMO_GAME_FALLBACK_CANT
 :pull TK
-you.say \"I can't\"
+you.say DEMO_GAME_FALLBACK_CANT
 :push TK
-you.say \"I can't\"
+you.say DEMO_GAME_FALLBACK_CANT
 :open TK
-you.say \"I can't open that\"
+you.say DEMO_GAME_FALLBACK_CANT_OPEN
 :close TK
-you.say \"I can't close that\"
+you.say DEMO_GAME_FALLBACK_CANT_CLOSE
 
 :pick_up TK
-you.say \"I better leave it there\"
+you.say DEMO_GAME_FALLBACK_PICK_UP
 "

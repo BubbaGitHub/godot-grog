@@ -3,3 +3,18 @@ DEMO_GAME_TRANSLATIONS_HI	Hi!	¡Hola!
 DEMO_GAME_TRANSLATIONS_HOW_ARE_YOU	How are you?	¿Cómo estás?
 DEMO_GAME_TRANSLATIONS_FINE	Fine.	Bien.
 DEMO_GAME_TRANSLATIONS_INTRO	These dialogs are translated to your language	Estos diálogos están traducidos a tu idioma
+ACTION_WALK_TO	walk to	ir a
+ACTION_GIVE	give	dar
+ACTION_PICK_UP	pick up	recoger
+ACTION_USE	use	usar
+ACTION_OPEN	open	abrir
+ACTION_LOOK_AT	look at	mirar
+ACTION_PUSH	push	empujar
+ACTION_CLOSE	close	cerrar
+ACTION_TALK_TO	talk to	hablar
+ACTION_PULL	pull	tirar
+DEMO_GAME_FALLBACK_LOOK	I see.	Veo.
+DEMO_GAME_FALLBACK_CANT	I can't.	No puedo.
+DEMO_GAME_FALLBACK_CANT_OPEN	I can't open that.	No puedo abrirlo.
+DEMO_GAME_FALLBACK_CANT_CLOSE	I can't close that.	No puedo cerrarlo.
+DEMO_GAME_FALLBACK_PICK_UP	I better leave it there.	Mejor lo dejo ahí.

@@ -2,9 +2,17 @@ extends "res://tools/ui_tools/object_list_element.gd"
 
 export (NodePath) var label_path
 
-func draw_element(_old, _new: String):
-	if _new:
-		set_label_text(_new.capitalize())
+var localized_name
+
+func draw_element(_old, new_action: String):
+	if new_action:
+		var translation_key = "ACTION_" + new_action.replace(" ", "_").to_upper()
+		localized_name = capitalize_first(tr(translation_key))
+		set_label_text(localized_name)
+
+func capitalize_first(text: String) -> String:
+	text[0] = text[0].to_upper()
+	return text
 
 func check():
 	$check.pressed = true

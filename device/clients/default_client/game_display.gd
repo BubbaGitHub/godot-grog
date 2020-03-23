@@ -31,7 +31,7 @@ var input_state = InputState.Nothing
 var input_position: Vector2
 
 var current_action = null
-
+var default_action: Node
 
 # Node hooks
 onready var _actions: Control = get_node(actions_path)
@@ -59,6 +59,9 @@ func init(p_game_server: GameServer):
 	server = p_game_server
 	data = server.data
 	
+	default_action = _actions.element_view_model.instance()
+	default_action.set_target(data.default_action)
+		
 	_hide_controls()
 	
 	make_empty(_actions)
@@ -110,12 +113,10 @@ func on_server_event(event_name, args):
 
 func on_game_started():
 	_hide_all()
-	current_action = data.default_action
-	_action_display.text = current_action.capitalize()
+	_set_current_action(default_action)
 
 func on_game_ended():
 	_end_game()
-	_actions.deselect()
 
 func on_input_enabled():
 	_set_input_enabled(true)
@@ -156,7 +157,8 @@ func on_say(subject: Node, speech: String, _duration: float, skippable: bool):
 func _end_game():
 	server = null
 	_hide_all()
-		
+	_actions.deselect()
+	default_action.queue_free()
 	emit_signal("game_ended")
 
 func _hide_all():
@@ -174,7 +176,7 @@ func _left_click(position: Vector2):
 	var clicked_item = _get_item_at(position)
 	
 	if clicked_item:
-		server.interact_request(clicked_item, current_action)
+		server.interact_request(clicked_item, current_action.target)
 	else:
 		server.go_to_request(position)
 
@@ -221,14 +223,18 @@ func _set_input_enabled(new_value: bool):
 	_input_enabled = new_value
 	_input_enabled_flag.pressed = new_value
 
-func _on_action_selected(_old_view, _new_view):
-	var new_action = _new_view.get_target()
-	current_action = new_action
-	_action_display.text = new_action.capitalize()
+func _on_action_selected(_old_action, new_action: Node):
+	_set_current_action(new_action)
+	
 
 func _on_action_deselected(_old_view):
-	current_action = data.default_action
-	_action_display.text = current_action.capitalize()
+	_set_current_action(default_action)
+
+func _set_current_action(new_action):
+	current_action = new_action
+	#var translation_key = "ACTION_" + new_action.replace(" ", "_").to_upper()
+	#var caption = tr(translation_key).capitalize()
+	_action_display.text = new_action.localized_name
 
 # Misc
 
