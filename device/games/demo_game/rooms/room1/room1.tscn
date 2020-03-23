@@ -65,4 +65,4 @@ global_id = "bust"
 color = Color( 0.76, 0.76, 0.76, 1 )
 
 [node name="interact_position" type="Position2D" parent="items/bust"]
-position = Vector2( -134.867, 228.481 )
+position = Vector2( -46.8669, 237.481 )

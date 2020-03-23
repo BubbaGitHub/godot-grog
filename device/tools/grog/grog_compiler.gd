@@ -1,4 +1,3 @@
-
 class_name GrogCompiler
 
 # Tokenizer patterns
@@ -62,9 +61,16 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 		var sequence_name: String = current_line.sequence_name
 		var params: Array = current_line.params
 		
-		# TODO telekinetic
+		var telekinetic = false
 		
-		if params.size() > 0 and false: # TODO!
+		# doing this because currently 'telekinetic' is the only sequence parameter
+		if params:
+			var param = params[0].content.to_lower()
+			if param == "telekinetic" or param == "tk":
+				telekinetic = true
+				params.pop_front()
+		
+		if params.size() > 0:
 			for j in range(params.size()):
 				var param = params[j]
 				compiled_script.add_error("Sequence '%s': invalid param '%s' (line %s)" % [sequence_name, token_str(param), line_num])
@@ -198,7 +204,9 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 				params = final_params
 			})
 		
-		compiled_script.add_sequence(sequence_name, statements)
+		var sequence = Sequence.new(statements, telekinetic)
+		
+		compiled_script.add_sequence(sequence_name, sequence)
 		
 	#return compiled_script
 

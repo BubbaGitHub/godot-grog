@@ -100,9 +100,11 @@ func on_game_ended():
 
 func on_input_enabled():
 	_set_input_enabled(true)
+	_show_controls()
 	
 func on_input_disabled():
 	_set_input_enabled(false)
+	_hide_controls()
 
 func on_room_loaded(_room):
 	pass
@@ -112,8 +114,6 @@ func on_actor_loaded(_actor):
 
 func on_wait_started(_duration: float, skippable: bool):
 	# start waiting '_duration' seconds
-	
-	_hide_controls()
 	_set_skippable(skippable)
 
 func on_wait_ended():
@@ -165,8 +165,6 @@ func _get_item_at(position: Vector2):
 	return null
 
 func _say_text(speech, color, text_position):
-	_hide_controls()
-	
 	_text_label_anchor.rect_position = text_position
 	
 	_text_label.clear()

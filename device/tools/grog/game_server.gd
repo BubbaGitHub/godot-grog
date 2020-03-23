@@ -183,6 +183,8 @@ func say(item_name: String, speech_token: Dictionary, opts = {}):
 		if not item:
 			return empty_action
 	
+	# else is a 'global' say
+	
 	var duration: float = opts.get("duration", 2.0) # TODO harcoded default say duration
 	var skippable: bool = opts.get("skippable", true) # TODO harcoded default say skippable
 
@@ -261,17 +263,18 @@ func interact_request(item: Node2D, trigger_name: String):
 		print("No item in room")
 		return
 	
-	var _sequence = item.get_sequence(trigger_name)
+	var context = {
+		"self": item.global_id,
+		"you": current_player.global_id
+	}
+	
+	var _sequence: Sequence = item.get_sequence(trigger_name)
 	
 	if _sequence == null:
 		# get fallback
-		print("Getting fallback for '%s'" % trigger_name)
 		_sequence = fallback_script.get_sequence(trigger_name)
-		print(_sequence)
 	
-	# TODO telekinetic case
-	
-	if true: # TODO! not _sequence.is_telekinetic():
+	if not _sequence.is_telekinetic():
 		var target_position = item.get_interact_position()
 		
 		event_queue.push_action({
@@ -279,13 +282,10 @@ func interact_request(item: Node2D, trigger_name: String):
 			params = [current_player, target_position, false]
 		})
 	
-	# TODO evaluate interaction sequence
+	var instructions = _sequence.in_context(context)
 	
-#	event_queue.push_action({
-#		command = "_interact",
-#		params =  [current_player, item, _sequence]
-#	})
-
+	event_queue.push_actions(instructions)
+	
 func stop_request():
 	event_queue.stop_asap()
 
@@ -420,16 +420,6 @@ func _walk_coroutine(item, path: PoolVector2Array):
 	
 	item.emit_signal("stop_walking")
 
-#func _interact(actor: Node, item: Node, action: String):
-#
-#	# TODO
-#
-#	return { block = true, routine = _interact_coroutine() }
-#
-#func _interact_coroutine():
-#	while true:
-#		yield()
-
 func _free_all():
 	if current_player:
 		current_room.remove_child(current_player)
@@ -468,9 +458,11 @@ func _run_script(script_resource: Resource, sequence_name: String):
 
 func _run_compiled(compiled_script: CompiledGrogScript, sequence_name: String):
 	if compiled_script.has_sequence(sequence_name):
-		var instructions = compiled_script.get_sequence(sequence_name)
+		# TODO
+		var context = {}
+		var sequence: Sequence = compiled_script.get_sequence(sequence_name)
 		
-		event_queue.push_actions(instructions)
+		event_queue.push_actions(sequence.get_instructions())
 	else:
 		print("Sequence '%s' not found" % sequence_name)
 

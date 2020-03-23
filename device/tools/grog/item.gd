@@ -19,7 +19,7 @@ var _compiled_script: CompiledGrogScript
 func _ready():
 	add_to_group("item")
 
-func get_sequence(trigger_name: String): # returns array or null
+func get_sequence(trigger_name: String) -> Sequence:
 	if not _compiled_script and code:
 		_compiled_script = grog.compile_text(code)
 		
@@ -27,10 +27,7 @@ func get_sequence(trigger_name: String): # returns array or null
 			print("Item '%s': script is invalid")
 			_compiled_script.print_errors()
 	
-	if not _compiled_script:
-		print("No code")
-		return null
-	elif _compiled_script.is_valid and _compiled_script.has_sequence(trigger_name):
+	if _compiled_script and _compiled_script.is_valid and _compiled_script.has_sequence(trigger_name):
 		return _compiled_script.get_sequence(trigger_name)
 	else:
 		# returns null so it defaults to fallback

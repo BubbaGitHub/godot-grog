@@ -87,7 +87,7 @@ func test_room(_room_resource, _actor_resource):
 	
 	start_sequence.append({ command = "enable_input", params = [] })
 	
-	compiled_script.add_sequence("start", start_sequence)
+	compiled_script.add_sequence("start", Sequence.new(start_sequence))
 	
 	play_game(GameServer.StartMode.FromCompiledScript, compiled_script)
 
