@@ -32,6 +32,7 @@ var input_position: Vector2
 
 var current_action = null
 var default_action: Node
+var current_item: Node
 
 # Node hooks
 onready var _actions: Control = get_node(actions_path)
@@ -99,8 +100,22 @@ func _input(event):
 					input_state = InputState.Nothing
 		elif event.button_index == BUTTON_RIGHT:
 			if event.pressed:
-				server.skip_request()
-
+				if _skippable:
+					server.skip_request()
+				else:
+					_actions.deselect()
+					
+				
+	elif event is InputEventMouseMotion:
+		var mouse_position: Vector2 = event.position
+		
+		var item = _get_item_at(mouse_position)
+		
+		if item != current_item:
+			_set_current_item(item)
+		
+		
+	
 func on_server_event(event_name, args):
 	var handler_name = "on_" + event_name
 	
@@ -166,7 +181,7 @@ func _hide_all():
 	_set_input_enabled(false)
 	_text_label.clear()
 	_hide_controls()
-	_action_display.text = ""
+	#_action_display.text = ""
 
 func _left_click(position: Vector2):
 	if not server.current_room:
@@ -177,10 +192,15 @@ func _left_click(position: Vector2):
 	
 	if clicked_item:
 		server.interact_request(clicked_item, current_action.target)
+		# TODO
+		# _actions.deselect()
 	else:
 		server.go_to_request(position)
 
 func _get_item_at(position: Vector2):
+	if not server.current_room:
+		return null
+	
 	for item in server.current_room.get_items():
 		
 		var disp: Vector2 = item.global_position - position
@@ -232,9 +252,19 @@ func _on_action_deselected(_old_view):
 
 func _set_current_action(new_action):
 	current_action = new_action
-	#var translation_key = "ACTION_" + new_action.replace(" ", "_").to_upper()
-	#var caption = tr(translation_key).capitalize()
-	_action_display.text = new_action.localized_name
+	_update_action_display()
+	
+func _set_current_item(new_item):
+	current_item = new_item
+	_update_action_display()
+
+func _update_action_display():
+	if current_item:
+		var translation_key = "ITEM_" + current_item.global_id.to_upper()
+		var localized_item = tr(translation_key)
+		_action_display.text = current_action.localized_name + " " + localized_item
+	else:
+		_action_display.text = current_action.localized_name
 
 # Misc
 
