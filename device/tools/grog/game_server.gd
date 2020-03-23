@@ -211,8 +211,13 @@ func walk(item_name: String, opts: Dictionary):
 	
 	return _walk_to(item, target_position)
 	
-func end(_params = []):
+func end(_opts = {}):
 	return { stop = true }
+
+func set_global(var_name: String, value: bool, _opts = {}):
+	globals[var_name] = value
+	
+	return empty_action
 
 ##############################
 

@@ -72,6 +72,14 @@ var commands = {
 		has_subject = false,
 		required_params = [],
 		named_params = []
+	},
+	set_global = {
+		has_subject = false,
+		required_params = [
+			ParameterType.StringType, # TODO accept only raw?
+			ParameterType.BooleanType
+		],
+		named_params = []
 	}
 }
 

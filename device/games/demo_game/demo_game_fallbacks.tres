@@ -30,4 +30,15 @@ you.say DEMO_GAME_FALLBACK_CANT_CLOSE
 
 :pick_up TK
 you.say DEMO_GAME_FALLBACK_PICK_UP
+
+#:walk_to
+#:give
+#:pick_up
+#:use
+#:open
+#:look_at
+#:push
+#:close
+#:talk_to
+#:pull
 "

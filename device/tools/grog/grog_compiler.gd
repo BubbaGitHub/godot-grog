@@ -1,10 +1,5 @@
 class_name GrogCompiler
 
-# Tokenizer patterns
-
-# any number of tabs followed by any number of spaces and non-whitespaces (anything but tabs)
-const line_regex_pattern = "^(\\t)*(\\S|\\ )*$"
-
 # Compiler patterns
 const sequence_header_regex_pattern = "^\\:([a-zA-Z0-9\\.\\-\\_\\ \\#]+)$"
 
@@ -58,7 +53,12 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 		
 		# reading sequence header line
 		
-		var sequence_name: String = current_line.sequence_name
+		var sequence_trigger: String = current_line.sequence_trigger
+		
+		if compiled_script.has_sequence(sequence_trigger):
+			compiled_script.add_error("Duplicated trigger '%s'" % sequence_trigger)
+			return
+		
 		var params: Array = current_line.params
 		
 		var telekinetic = false
@@ -73,7 +73,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 		if params.size() > 0:
 			for j in range(params.size()):
 				var param = params[j]
-				compiled_script.add_error("Sequence '%s': invalid param '%s' (line %s)" % [sequence_name, token_str(param), line_num])
+				compiled_script.add_error("Sequence '%s': invalid param '%s' (line %s)" % [sequence_trigger, token_str(param), line_num])
 				return
 		
 		var statements = []
@@ -133,8 +133,17 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 							compiled_script.add_error("Token '%s' is not a valid float parameter (line %s)" % [float_str, line_num])
 							return
 						param = float(param_token.content)
+					grog.ParameterType.BooleanType:
+						var option_raw_value = param_token.content
+						if option_raw_value.to_lower() == "false":
+							param = false
+						elif option_raw_value.to_lower() == "true":
+							param = true
+						else:
+							compiled_script.add_error("Option '%s' is not a valid boolean (line %s)" % [option_raw_value, line_num])
+							return
 					_:
-						compiled_script.add_error("Grog error: unexpected parameter type %s" % required[j])
+						compiled_script.add_error("Grog error: unexpected parameter type %s" % grog.ParameterType.keys()[required[j]])
 						return
 				
 				final_params.append(param)
@@ -206,7 +215,7 @@ func compile_lines(compiled_script: CompiledGrogScript, lines: Array) -> void:
 		
 		var sequence = Sequence.new(statements, telekinetic)
 		
-		compiled_script.add_sequence(sequence_name, sequence)
+		compiled_script.add_sequence(sequence_trigger, sequence)
 		
 	#return compiled_script
 
@@ -251,7 +260,7 @@ func identify_line(compiled_script: CompiledGrogScript, line: Dictionary) -> voi
 		# TODO check sequence headers parameters or additional tokens (if any)
 		
 		line.is_sequence_header = true
-		line.sequence_name = result.strings[1]
+		line.sequence_trigger = result.strings[1]
 		
 	else:
 		# it's a command
@@ -298,12 +307,6 @@ func tokenize_lines(compiled_script: CompiledGrogScript, raw_lines: Array) -> Ar
 func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 	var raw_line = c_line.raw
 	
-	if not contains_pattern(raw_line, line_regex()):
-		compiled_script.add_error("Line '%s' is not valid" % c_line.line_number)
-		compiled_script.add_error("%s" % raw_line)
-		
-		return
-	
 	var indent_level = number_of_leading_tabs(raw_line)
 	var line_content = raw_line.substr(indent_level)
 	
@@ -312,7 +315,7 @@ func tokenize(compiled_script: CompiledGrogScript, c_line: Dictionary) -> void:
 	if not compiled_script.is_valid:
 		# Invalid line
 		return
-	
+		
 	c_line.blank = tokens.size() == 0
 	
 	if not c_line.blank:
@@ -439,9 +442,6 @@ func contains_pattern(a_string: String, pattern: RegEx) -> bool:
 	var result = pattern.search(a_string)
 	
 	return result != null
-
-func line_regex():
-	return regex(line_regex_pattern)
 
 func sequence_header_regex():
 	return regex(sequence_header_regex_pattern)

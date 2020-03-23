@@ -24,7 +24,7 @@ func get_sequence(trigger_name: String) -> Sequence:
 		_compiled_script = grog.compile_text(code)
 		
 		if not _compiled_script.is_valid:
-			print("Item '%s': script is invalid")
+			print("Item '%s': script is invalid" % global_id)
 			_compiled_script.print_errors()
 	
 	if _compiled_script and _compiled_script.is_valid and _compiled_script.has_sequence(trigger_name):

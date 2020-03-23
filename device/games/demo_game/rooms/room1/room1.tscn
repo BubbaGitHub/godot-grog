@@ -46,7 +46,7 @@ position = Vector2( 0, -23 )
 navpoly = SubResource( 1 )
 
 [node name="default_player_position" type="Position2D" parent="."]
-position = Vector2( 576.891, 701.093 )
+position = Vector2( 282.39, 540.543 )
 
 [node name="pos1" type="Position2D" parent="."]
 position = Vector2( -279.725, 685.195 )
@@ -64,7 +64,29 @@ position = Vector2( 327.674, 303.018 )
 script = ExtResource( 5 )
 global_id = "bust"
 color = Color( 0.76, 0.76, 0.76, 1 )
-code = ""
+code = "# 'self' is the item
+# 'you' is the interacting player
+
+#:walk_to
+#:give
+#:pick_up
+#:use
+#:open
+#:look_at
+#:push
+#:close
+#:talk_to
+#:pull
+
+:look_at
+you.say \"Lindo busto\"
+
+
+#if bust_seen
+#	you.say \"Ya te dije que es un lindo busto\"
+#else
+#	you.say \"Lindo busto\"
+#	.set_global bust_seen true"
 walk_speed = 300.0
 radius = 50.0
 
