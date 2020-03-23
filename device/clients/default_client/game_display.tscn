@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://clients/default_client/game_display.gd" type="Script" id=1]
 [ext_resource path="res://clients/default_client/pixel_intv.otf" type="DynamicFontData" id=2]
 [ext_resource path="res://clients/default_client/action.tscn" type="PackedScene" id=3]
 [ext_resource path="res://apps/room_tester/rounded_rect.png" type="Texture" id=4]
+[ext_resource path="res://tools/ui_tools/object_list.gd" type="Script" id=5]
+[ext_resource path="res://clients/default_client/fondo.png" type="Texture" id=6]
 
 [sub_resource type="DynamicFont" id=1]
 size = 32
@@ -16,12 +18,15 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+action_button_model = ExtResource( 3 )
+actions_path = NodePath("command_area/controls/actions")
+room_area_path = NodePath("world_layer/room_area")
 room_place_path = NodePath("world_layer/room_area/room_anchor")
-controls_place_path = NodePath("command_area/controls")
+controls_place_path = NodePath("command_area")
 text_label_path = NodePath("text_layer/text_anchor/text")
 text_label_anchor_path = NodePath("text_layer/text_anchor")
-input_enabled_flag_path = NodePath("command_area/flags/VBoxContainer/input_enabled/CheckButton")
-skippable_flag_path = NodePath("command_area/flags/VBoxContainer/skippable/CheckButton")
+input_enabled_flag_path = NodePath("flags/VBoxContainer/input_enabled/CheckButton")
+skippable_flag_path = NodePath("flags/VBoxContainer/skippable/CheckButton")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchor_right = 1.0
@@ -31,12 +36,22 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 6 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="world_layer" type="CanvasLayer" parent="."]
 layer = 0
 
 [node name="room_area" type="Control" parent="world_layer"]
 anchor_right = 1.0
-anchor_bottom = 0.75
+margin_bottom = 777.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -77,9 +92,10 @@ __meta__ = {
 }
 
 [node name="command_area" type="Control" parent="."]
-anchor_top = 0.75
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = -256.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -89,107 +105,130 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -0.513306
 margin_bottom = -0.513306
-color = Color( 0.388235, 0.329412, 0.329412, 0.411765 )
+color = Color( 1, 1, 1, 0.0588235 )
 
 [node name="controls" type="Control" parent="command_area"]
-anchor_left = 0.5
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -600.0
-margin_top = 31.0
-margin_right = -121.0
-margin_bottom = -39.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GridContainer" type="GridContainer" parent="command_area/controls"]
+[node name="actions" type="GridContainer" parent="command_area/controls"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = 101.0
+margin_top = 3.0
+margin_right = -1053.0
+margin_bottom = -7.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 columns = 3
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+element_view_model = ExtResource( 3 )
+list_path = NodePath(".")
 
-[node name="Control" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_right = 157.0
-margin_bottom = 64.0
+[node name="Control" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 252.0
+margin_bottom = 79.0
 
-[node name="Control2" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 161.0
-margin_right = 318.0
-margin_bottom = 64.0
+[node name="Control2" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 256.0
+margin_right = 508.0
+margin_bottom = 79.0
 
-[node name="Control3" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 322.0
-margin_right = 479.0
-margin_bottom = 64.0
+[node name="Control3" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 512.0
+margin_right = 764.0
+margin_bottom = 79.0
 
-[node name="Control4" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_top = 68.0
-margin_right = 157.0
-margin_bottom = 132.0
+[node name="Control4" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 83.0
+margin_right = 252.0
+margin_bottom = 162.0
 
-[node name="Control5" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 161.0
-margin_top = 68.0
-margin_right = 318.0
-margin_bottom = 132.0
+[node name="Control5" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 256.0
+margin_top = 83.0
+margin_right = 508.0
+margin_bottom = 162.0
 
-[node name="Control6" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 322.0
-margin_top = 68.0
-margin_right = 479.0
-margin_bottom = 132.0
+[node name="Control6" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 512.0
+margin_top = 83.0
+margin_right = 764.0
+margin_bottom = 162.0
 
-[node name="Control7" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_top = 136.0
-margin_right = 157.0
-margin_bottom = 200.0
+[node name="Control7" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 166.0
+margin_right = 252.0
+margin_bottom = 245.0
 
-[node name="Control8" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 161.0
-margin_top = 136.0
-margin_right = 318.0
-margin_bottom = 200.0
+[node name="Control8" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 256.0
+margin_top = 166.0
+margin_right = 508.0
+margin_bottom = 245.0
 
-[node name="Control9" parent="command_area/controls/GridContainer" instance=ExtResource( 3 )]
-margin_left = 322.0
-margin_top = 136.0
-margin_right = 479.0
-margin_bottom = 200.0
+[node name="Control9" parent="command_area/controls/actions" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 512.0
+margin_top = 166.0
+margin_right = 764.0
+margin_bottom = 245.0
 
-[node name="quit_button" type="Button" parent="command_area"]
+[node name="quit_button" type="Button" parent="."]
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-margin_left = 673.965
-margin_top = -167.896
-margin_right = 861.965
-margin_bottom = -92.8958
+margin_left = 739.339
+margin_top = -119.143
+margin_right = 927.339
+margin_bottom = -44.1423
 text = "Quit"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="flags" type="NinePatchRect" parent="command_area"]
+[node name="flags" type="NinePatchRect" parent="."]
 self_modulate = Color( 0.811765, 0.588235, 0.588235, 0.180392 )
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 1187.0
-margin_top = 30.0
-margin_right = -458.0
-margin_bottom = -32.0
+margin_left = 1695.92
+margin_top = 841.108
+margin_right = -28.0833
+margin_bottom = -138.892
 texture = ExtResource( 4 )
 patch_margin_left = 10
 patch_margin_top = 10
 patch_margin_right = 10
 patch_margin_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="VBoxContainer" type="VBoxContainer" parent="command_area/flags"]
+[node name="VBoxContainer" type="VBoxContainer" parent="flags"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
@@ -200,12 +239,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="input_enabled" type="Control" parent="command_area/flags/VBoxContainer"]
-margin_right = 255.0
-margin_bottom = 92.0
+[node name="input_enabled" type="Control" parent="flags/VBoxContainer"]
+margin_right = 175.0
+margin_bottom = 38.0
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="command_area/flags/VBoxContainer/input_enabled"]
+[node name="Label" type="Label" parent="flags/VBoxContainer/input_enabled"]
 anchor_top = 0.5
 anchor_bottom = 0.5
 margin_left = 4.10669
@@ -218,7 +257,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CheckButton" type="CheckButton" parent="command_area/flags/VBoxContainer/input_enabled"]
+[node name="CheckButton" type="CheckButton" parent="flags/VBoxContainer/input_enabled"]
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -232,13 +271,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="skippable" type="Control" parent="command_area/flags/VBoxContainer"]
-margin_top = 96.0
-margin_right = 255.0
-margin_bottom = 188.0
+[node name="skippable" type="Control" parent="flags/VBoxContainer"]
+margin_top = 42.0
+margin_right = 175.0
+margin_bottom = 80.0
 size_flags_vertical = 3
 
-[node name="CheckButton" type="CheckButton" parent="command_area/flags/VBoxContainer/skippable"]
+[node name="CheckButton" type="CheckButton" parent="flags/VBoxContainer/skippable"]
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -252,7 +291,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="command_area/flags/VBoxContainer/skippable"]
+[node name="Label" type="Label" parent="flags/VBoxContainer/skippable"]
 anchor_top = 0.5
 anchor_bottom = 0.5
 margin_left = 4.10669
@@ -264,4 +303,4 @@ valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="pressed" from="command_area/quit_button" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="quit_button" to="." method="_on_quit_button_pressed"]

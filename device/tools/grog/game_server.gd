@@ -458,8 +458,6 @@ func _run_script(script_resource: Resource, sequence_name: String):
 
 func _run_compiled(compiled_script: CompiledGrogScript, sequence_name: String):
 	if compiled_script.has_sequence(sequence_name):
-		# TODO
-		var context = {}
 		var sequence: Sequence = compiled_script.get_sequence(sequence_name)
 		
 		event_queue.push_actions(sequence.get_instructions())

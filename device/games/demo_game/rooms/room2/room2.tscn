@@ -11,6 +11,7 @@ polygons = [ PoolIntArray( 0, 1, 2, 3 ), PoolIntArray( 2, 4, 5, 3 ), PoolIntArra
 outlines = [ PoolVector2Array( -276.7, 547.05, -541.651, 767.385, 704, 768, 617.982, 667.559, 475.346, 666.896, 391.092, 579.324, 495.184, 579.457, 436.868, 546.816 ), PoolVector2Array( -134.578, 617.09, 251.455, 617.09, 221.168, 567.81, -116.127, 567.29 ) ]
 
 [node name="room2" type="Node2D"]
+position = Vector2( 0, -23 )
 script = ExtResource( 4 )
 default_player_position_path = NodePath("default_player_position")
 navigation_path = NodePath("../room2/Navigation2D")

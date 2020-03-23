@@ -1,9 +1,8 @@
-[gd_resource type="Resource" load_steps=12 format=2]
+[gd_resource type="Resource" load_steps=11 format=2]
 
 [ext_resource path="res://tools/grog/game_resource.gd" type="Script" id=1]
 [ext_resource path="res://games/demo_game/rooms/room1/demo_room.tres" type="Resource" id=2]
 [ext_resource path="res://games/demo_game/rooms/room2/demo_room2.tres" type="Resource" id=3]
-[ext_resource path="res://tools/grog/game_server.gd" type="Script" id=4]
 [ext_resource path="res://games/demo_game/demo_game_main_script.tres" type="Resource" id=5]
 [ext_resource path="res://games/demo_game/actors/guybrush/guybrush.tres" type="Resource" id=6]
 [ext_resource path="res://games/demo_game/actors/mark/mark.tres" type="Resource" id=7]
@@ -14,7 +13,8 @@
 
 [resource]
 script = ExtResource( 1 )
+default_action = "go"
+actions = [ "give", "pick_up", "use", "open", "look_at", "push", "close", "talk to", "pull" ]
 scripts = [ ExtResource( 11 ), ExtResource( 5 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ) ]
 rooms = [ ExtResource( 2 ), ExtResource( 3 ) ]
 actors = [ ExtResource( 6 ), ExtResource( 7 ) ]
-game_server_model = ExtResource( 4 )

@@ -8,6 +8,26 @@ script = ExtResource( 1 )
 code_or_filename = "# 'self' is the item
 # 'you' is the interacting player
 
-:look TK
+:go
+# does nothing
 
-you.say \"I can't\""
+:look_at
+you.say \"I see\"
+
+:give TK
+# does nothing
+
+:use TK
+you.say \"I can't\"
+:pull TK
+you.say \"I can't\"
+:push TK
+you.say \"I can't\"
+:open TK
+you.say \"I can't open that\"
+:close TK
+you.say \"I can't close that\"
+
+:pick_up TK
+you.say \"I better leave it there\"
+"

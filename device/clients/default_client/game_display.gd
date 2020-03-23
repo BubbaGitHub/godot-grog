@@ -2,6 +2,11 @@ extends Node
 
 signal game_ended
 
+export (Resource) var action_button_model
+
+export (NodePath) var actions_path
+
+export (NodePath) var room_area_path
 export (NodePath) var room_place_path
 export (NodePath) var controls_place_path
 
@@ -14,6 +19,7 @@ export (NodePath) var skippable_flag_path
 
 # Server
 var server: GameServer
+var data: GameResource
 
 var _skippable: bool
 var _input_enabled: bool
@@ -21,9 +27,15 @@ var _input_enabled: bool
 # Input
 enum InputState { Nothing, DoingLeftClick }
 var input_state = InputState.Nothing
-var input_position = null
+var input_position: Vector2
+
+var current_action = null
+
 
 # Node hooks
+var _actions: Control
+
+var _room_area: Control
 var _room_place: Control
 var _controls_place: Control
 
@@ -36,6 +48,9 @@ var _input_enabled_flag: CheckButton
 var _skippable_flag: CheckButton
 
 func _ready():
+	_actions = get_node(actions_path)
+	
+	_room_area = get_node(room_area_path)
 	_room_place = get_node(room_place_path)
 	_controls_place = get_node(controls_place_path)
 	
@@ -47,8 +62,19 @@ func _ready():
 	_input_enabled_flag = get_node(input_enabled_flag_path)
 	_skippable_flag = get_node(skippable_flag_path)
 
-func init(game_server):
-	server = game_server
+func init(p_game_server: GameServer):
+	server = p_game_server
+	data = server.data
+	
+	_hide_controls()
+	
+	make_empty(_actions)
+	
+	for action_name in data.actions:
+		_actions.add_element(action_name)
+	
+	_actions.connect("on_element_selected", self, "_on_action_selected")
+	_actions.connect("on_element_deselected", self, "_on_action_deselected")
 	
 	#warning-ignore:return_value_discarded
 	server.connect("game_server_event", self, "on_server_event")
@@ -63,17 +89,18 @@ func _input(event):
 		return
 	
 	if event is InputEventMouseButton:
+		var mouse_position: Vector2 = event.position
+		if not rect_includes_point(_room_area.get_global_rect(), mouse_position):
+			return
+			
 		if event.button_index == BUTTON_LEFT:
 			if event.pressed:
 				if input_state == InputState.Nothing:
 					input_state = InputState.DoingLeftClick
-					input_position = event.position
+					input_position = mouse_position
 			else:
 				if input_state == InputState.DoingLeftClick:
-					# TODO give it some threshold!
-					# currently only exact clicks work
-					
-					if event.position == input_position:
+					if mouse_position.is_equal_approx(input_position):
 						_left_click(input_position)
 					
 					input_state = InputState.Nothing
@@ -149,7 +176,11 @@ func _left_click(position: Vector2):
 	var clicked_item = _get_item_at(position)
 	
 	if clicked_item:
-		server.interact_request(clicked_item, "look")
+		var action = current_action
+		if action == null:
+			action = data.default_action
+		
+		server.interact_request(clicked_item, action)
 	else:
 		server.go_to_request(position)
 
@@ -195,3 +226,26 @@ func _set_skippable(new_value: bool):
 func _set_input_enabled(new_value: bool):
 	_input_enabled = new_value
 	_input_enabled_flag.pressed = new_value
+
+func _on_action_selected(_old_view, _new_view):
+	var new_action = _new_view.get_target()
+	current_action = new_action
+
+func _on_action_deselected(_old_view):
+	current_action = null
+
+# Misc
+
+func make_empty(node: Node):
+	while node.get_child_count() > 0:
+		var child = node.get_child(0)
+		node.remove_child(child)
+		child.queue_free()
+
+func rect_includes_point(rect: Rect2, point: Vector2) -> bool:
+	var eq_x = point.x >= rect.position.x and point.x <= rect.end.x
+	var eq_y = point.y >= rect.position.y and point.y <= rect.end.y
+	
+	var eq = eq_x and eq_y
+	
+	return eq

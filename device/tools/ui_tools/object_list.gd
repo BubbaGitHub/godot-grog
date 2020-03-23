@@ -26,7 +26,7 @@ var _current_selected_view = null
 func get_current():
 	return _current_selected_view.target if _current_selected_view else null
 
-func add_element(target: Resource) -> void:
+func add_element(target) -> void:
 	if not element_view_model:
 		print("No element_model")
 		return

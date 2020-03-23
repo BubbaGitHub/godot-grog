@@ -9,28 +9,22 @@ extends "view.gd"
 
 signal element_toggled
 
-export (NodePath) var label_path
-
 #	@PRIVATE
 
 func target_changing(_old_target, _new_target):
-	if _new_target:
-		set_label_text(_new_target.get_name())
+	draw_element(_old_target, _new_target)
 
-func set_label_text(new_text):
-	var label = get_label()
-	if label:
-		label.text = new_text
+# override me
+func draw_element(_old_target, _new_target):
+	pass
 
-func get_label():
-	return get_node(label_path)
-
+# override me
 func check():
-	$check.pressed = true
+	pass
 	
-
+# override me
 func uncheck():
-	$check.pressed = false
+	pass
 	
 func _on_check_toggled(toggle_value):
 	emit_signal("element_toggled", self, toggle_value)
